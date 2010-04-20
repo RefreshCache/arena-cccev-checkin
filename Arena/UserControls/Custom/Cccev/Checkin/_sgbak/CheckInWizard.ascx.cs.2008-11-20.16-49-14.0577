@@ -1,0 +1,290 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+using Arena.Portal;
+using Arena.Core;
+using Arena.Custom.Cccev.CheckIn;
+
+namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
+{
+    public partial class CheckInWizard : PortalControl
+    {
+        #region Module Settings
+
+        [CampusSetting("Campus", "Campus that this application/page is serving.", true)]
+        public string CampusSetting { get { return Setting("Campus", "", true); } }
+
+        [NumericSetting("Occurrence Type Group ID", "ID for the Occurrence Type Group that contains the occurrenct type.", true)]
+        public string OccurrenceTypeGroupIDSetting { get { return Setting("OccurrenceTypeGroupID", "", true); } }
+
+        [NumericSetting("Look Ahead Hours", "Number of hours to look ahead for occurrences (defaults to 2).", false)]
+        public string LookAheadHoursSetting { get { return Setting("LookAheadHours", "2", false); } }
+
+        [NumericSetting("Look Ahead Minutes", "Number of minutes to look ahead for occurrences (defaults to 0).", false)]
+        public string LookAheadMinutesSetting { get { return Setting("LookAheadMinutes", "0", false); } }
+
+        [BooleanSetting("Attendee Abilitiies", "Determines whether or not to show view to set ability person attribute.", true, true)]
+        public string GetAttendeeAbilitiesSetting { get { return Setting("GetAttendeeAbilities", "true", true); } }
+
+        [TextSetting("Event is Closed Message", "Message to show when event is closed", false)]
+        public string EventIsClosedMessageSetting { get { return Setting("EventIsClosedMessage", "The event is closed", false); } }
+
+        [TextSetting("Scan Now Message", "Message to show it is OK for people to try scanning their code", false)]
+        public string ScanNowMessageSetting { get { return Setting("ScanNowMessage", "Scan Now", false); } }
+
+        [TextSetting("Search By Phone Message", "Message to show on button to search by phone", false)]
+        public string SearchByPhoneMessageSetting { get { return Setting("SearchByPhoneMessage", "Search By Phone", false); } }
+
+        [BooleanSetting("Allow Scan By Phone", "Controls whether or not a person can search by phone.  Defaults to true.", true, true)]
+        public string AllowScanByPhoneSetting { get { return Setting("AllowScanByPhone", "true", false); } }
+
+        [ListFromSqlSetting("Ability Level Lookup Type", "Sets lookup type of ability person attribute.", true, "",
+            "SELECT [lookup_type_id], [lookup_type_name] FROM [core_lookup_type] ORDER BY [lookup_type_name]")]
+        public string AbilityLevelLookupTypeIDSetting { get { return Setting("AbilityLevelLookupTypeID", "", true); } }
+
+        [ListFromSqlSetting("Ability Level Attribute", "Sets ability level person attribute.", true, "",
+            "SELECT [attribute_id], [attribute_name] FROM [core_attribute] WHERE [attribute_type] = 3 ORDER BY [attribute_name]")]
+        public string AbilityLevelAttributeIDSetting { get { return Setting("AbilityLevelAttributeID", "", true); } }
+
+        #endregion
+
+        #region Private Members
+
+        private CheckInStates state = CheckInStates.Init;
+        private OccurrenceCollection occurrences = null;
+        private int campusID = -1;
+
+        #endregion
+
+        #region Page Events
+
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            btnSearchByPhone.Click += new EventHandler(btnSearchByPhone_Click); 
+        }
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            GetState();
+            campusID = int.Parse(CampusSetting);
+            RegisterScripts();
+            SetOccurrences();  // this call depends on state... state must be set first
+            
+            if (!Page.IsPostBack)
+                ShowView();
+        }
+
+        #endregion
+
+        #region Events
+
+        private void btnSearchByPhone_Click(object sender, EventArgs e)
+        {
+            state = CheckInStates.FamilySearch;
+            Session[Constants.SESS_STATE] = state;
+            ShowView();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void GetState()
+        {
+            if (Session[Constants.SESS_STATE] != null)
+                state = (CheckInStates)Enum.Parse(typeof(CheckInStates), Session[Constants.SESS_STATE].ToString());
+            else
+                state = CheckInStates.Init;
+        }
+
+        private void SetOccurrences()
+        {
+            if (state == CheckInStates.Init)
+            {
+                DateTime lookAhead = DateTime.Now;
+                lookAhead = lookAhead.AddHours(double.Parse(LookAheadHoursSetting));
+                lookAhead = lookAhead.AddMinutes(double.Parse(LookAheadMinutesSetting));
+                occurrences = Controller.GetOccurrences(int.Parse(OccurrenceTypeGroupIDSetting), lookAhead, DateTime.Now, campusID);
+                occurrences.SortByStartTime();
+                Session[Constants.SESS_LIST_OCCURRENCES_CHECKIN] = occurrences;
+            }
+            else
+                occurrences = (OccurrenceCollection)Session[Constants.SESS_LIST_OCCURRENCES_CHECKIN];
+        }
+
+        private void RegisterScripts()
+        {
+            StringBuilder script = new StringBuilder();
+            script.Append("<script language='JavaScript' src='UserControls/Custom/Cccev/CheckIn/misc/countdown.js'></script>");
+            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "scripts", script.ToString(), false);
+        }
+
+        /// <summary>
+        /// Hides all views then shows the appropriate view based on state information stored in session
+        /// </summary>
+        private void ShowView()
+        {
+            HideViews();
+
+            switch (state)
+            {
+                case CheckInStates.Scan:
+                    ShowScan();
+                    break;
+                case CheckInStates.FamilySearch:
+                    ShowFamilySearch();
+                    break;
+                case CheckInStates.FamilyNotFound:
+                    ShowFamilyNotFound();
+                    break;
+                case CheckInStates.SelectFamilyMember:
+                    ShowSelectFamilyMember();
+                    break;
+                case CheckInStates.SelectAbility:
+                    ShowSelectAbility();
+                    break;
+                case CheckInStates.SelectService:
+                    ShowSelectService();
+                    break;
+                case CheckInStates.ServiceNotFound:
+                    ShowServiceNotFound();
+                    break;
+                case CheckInStates.Confirm:
+                    ShowConfirm();
+                    break;
+                case CheckInStates.Success:
+                    ShowSuccess();
+                    break;
+                case CheckInStates.Failure:
+                    ShowFailure();
+                    break;
+                case CheckInStates.Init:
+                default:
+                    ShowInit();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Hides all update panels except for the title
+        /// </summary>
+        private void HideViews()
+        {
+            foreach (Control control in upCheckin.Controls)
+            {
+                if (control is Panel && control.ID != "pnlTitle")
+                    control.Visible = false;
+            }
+        }
+
+        #region Init View 
+
+        private void ShowInit()
+        {
+            pnlInit.Visible = true;
+            
+            if (!tbScan.Text.Trim().Equals(string.Empty))
+            {
+                if (state != CheckInStates.FamilySearch)
+                {
+                    state = CheckInStates.FamilySearch;
+                    Session[Constants.SESS_STATE] = state;
+                    ShowView();
+                }
+            }
+            else
+                SetCountDownTimer();
+
+            tbScan.Focus();
+            tbScan.Text = string.Empty;
+        }
+
+        private void SetCountDownTimer()
+        {
+            Occurrence occurrence = occurrences[0];
+
+            if (Controller.ReadyForCheckIn(occurrence))
+            {
+                lblTimeRemaining.Visible = false;
+                pnlSwipeCard.Visible = true;
+
+                if (bool.Parse(AllowScanByPhoneSetting))
+                {
+                    btnSearchByPhone.Visible = true;
+                    btnSearchByPhone.Text = SearchByPhoneMessageSetting;
+                }
+            }
+            else
+            {
+                lblTimeRemaining.Visible = true;
+
+                if (occurrences.Count > 0)
+                {
+                    DateTime nextStart = occurrences[0].CheckInStart;
+                    DateTime waitTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, nextStart.Hour, nextStart.Minute, nextStart.Second);
+                    lblTimeRemaining.Text = "<script language='JavaScript'>NowTime=\"" + DateTime.Now.ToString() + "\"; StartTime=\"" + waitTime.ToString() + "\";</script>";
+                }
+                else
+                    lblTimeRemaining.Text = EventIsClosedMessageSetting;
+            }
+        }
+
+        #endregion
+
+        private void ShowScan()
+        {
+            pnlScan.Visible = true;
+        }
+
+        private void ShowFamilySearch()
+        {
+            pnlFamilySearch.Visible = true;
+        }
+
+        private void ShowFamilyNotFound()
+        {
+            pnlFamilyNotFound.Visible = true;
+        }
+
+        private void ShowSelectFamilyMember()
+        {
+            pnlSelectFamilyMember.Visible = true;
+        }
+
+        private void ShowSelectAbility()
+        {
+            pnlSelectAbility.Visible = true;
+        }
+
+        private void ShowSelectService()
+        {
+            pnlSelectService.Visible = true;
+        }
+
+        private void ShowServiceNotFound()
+        {
+            pnlServiceNotFound.Visible = true;
+        }
+
+        private void ShowConfirm()
+        {
+            pnlConfirm.Visible = true;
+        }
+
+        private void ShowSuccess()
+        {
+            pnlSuccess.Visible = true;
+        }
+
+        private void ShowFailure()
+        {
+            pnlFailure.Visible = true;
+        }
+
+        #endregion
+    }
+}

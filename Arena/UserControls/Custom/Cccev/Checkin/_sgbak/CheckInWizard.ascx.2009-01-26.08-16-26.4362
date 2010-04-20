@@ -1,0 +1,536 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="CheckInWizard.ascx.cs" Inherits="ArenaWeb.UserControls.Custom.Cccev.Checkin.CheckInWizard" %>
+
+<script type="text/javascript">
+    var interval = parseInt('<%= RefreshTimeSetting %>');
+    var startTime;
+    var rightNow;
+    var refreshSeconds = 0;
+    var secondsSinceLastRefresh = 0;
+    var state;
+    var shouldRefresh = true;
+     
+    function refreshPage()
+    {
+        startTime = new Date();
+        startTime = startTime.getTime();
+        refreshCountDown();
+    }
+
+    function refreshCountDown()
+    {
+        if (shouldRefresh)
+        {
+            rightNow = new Date();
+            rightNow = rightNow.getTime();
+            secondsSinceLastRefresh = (rightNow - startTime) / 1000;
+            refreshSeconds = Math.round(interval - secondsSinceLastRefresh);
+            var timer;
+
+            if (interval >= secondsSinceLastRefresh)
+            {
+                timer = setTimeout('refreshCountDown()', 1000);
+                window.status = "Page refresh: " + refreshSeconds + " State: " + state;
+            }
+            else
+            {
+                clearTimeout(timer);
+
+                if (state == 'confirm')
+                {
+                    $get('<%= btnConfirmContinue.ClientID %>').click();
+                }
+                else
+                {
+                    $get('<%= btnRedirect.ClientID %>').click();
+                }
+            }
+        }
+        else
+            window.status = '';
+    }
+
+    function resetTimer()
+    {
+        startTime = new Date();
+        startTime = startTime.getTime();
+        
+    }
+
+    function getState()
+    {
+        var init = document.getElementById('<%= pnlInit.ClientID %>');
+        var familySearch = document.getElementById('<%= pnlFamilySearch.ClientID %>');
+        var selectFamilyMember = document.getElementById('<%= pnlSelectFamilyMember.ClientID %>');
+        var noEligible = document.getElementById('<%= pnlNoEligiblePeople.ClientID %>');
+        var selectAbility = document.getElementById('<%= pnlSelectAbility.ClientID %>');
+        var selectService = document.getElementById('<%= pnlSelectService.ClientID %>');
+        var confirm = document.getElementById('<%= pnlConfirm.ClientID %>');
+        var results = document.getElementById('<%= pnlResults.ClientID %>');
+        var badKiosk = document.getElementById('<%= pnlBadKiosk.ClientID %>');
+
+        interval = 30;
+        shouldRefresh = true;
+
+        if (init) 
+        {
+            var timerLabel = document.getElementById('<%= lblTimeRemaining.ClientID %>');
+
+            if (timerLabel) 
+            {
+                shouldRefresh = false;
+            }
+            else 
+            {
+                state = 'init';
+                interval = 10;
+                shouldRefresh = true;
+            }
+        }
+        else if (familySearch)
+        {
+            state = 'familySearch';
+        }
+        else if (selectFamilyMember)
+        {
+            state = 'selectFamilyMember';
+        }
+        else if (noEligible)
+        {
+            state = 'noEligiblePeople';
+            interval = 10;
+        }
+        else if (selectAbility)
+        {
+            state = 'selectAbilityLevel';
+        }
+        else if (selectService)
+        {
+            state = 'selectService';
+        }
+        else if (confirm)
+        {
+            state = 'confirm';
+            interval = 10;
+        }
+        else if (results)
+        {
+            state = 'results';
+        }
+        else if (badKiosk)
+        {
+            state = 'badKiosk';
+            interval = 60;
+        }
+        else
+        {
+            state = 'undefined';
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    var txtPhone;
+    var button;
+    var label;
+    var maxDigits;
+
+    function pageLoad() 
+    {
+        txtPhone = document.getElementById('<%= txtPhone.ClientID %>');
+        button = document.getElementById('<%= btnFamilySearch.ClientID %>');
+        label = document.getElementById('<%= lblMessage.ClientID %>');
+        maxDigits = parseInt('<%= PhoneLengthSetting %>');
+
+        getState();
+        refreshPage();
+    }
+
+    function FireDefaultButton(event, target) {
+        var key_Zero = 47;
+        var key_Nine = 57;
+
+        if ((event.keyCode == 13 || event.which == 13) && !(event.srcElement && (event.srcElement.tagName.toLowerCase() == 'textarea')))
+        {
+            var defaultButton = document.getElementById(target);
+            if (defaultButton == 'undefined') defaultButton = document.all[target];
+
+            if (defaultButton && typeof (defaultButton.click) != 'undefined')
+            {
+                Search();
+                defaultButton.click();
+
+                txtPhone.disabled = true;
+                event.cancelBubble = true;
+                if (event.stopPropagation) event.stopPropagation();
+                return false;
+            }
+        }
+        else if (event && event.keyCode >= key_Zero && event.keyCode <= key_Nine)
+        {
+            // if there are already 9 numbers then this is the 10th...
+            if (txtPhone.value.length >= 9)
+            {
+                ClickDigit(String.fromCharCode(event.keyCode));
+                txtPhone.disabled = true;
+                event.cancelBubble = true;
+                if (event.stopPropagation) event.stopPropagation();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function GetKeys() {
+        var key_Enter = 13;
+        var key_Zero = 47;
+        var key_Nine = 57;
+
+        if (window.event && window.event.keyCode == key_Enter)
+        {
+            if (txtPhone.value.length >= maxDigits)
+            {
+                Search();
+                txtPhone.disabled = true;
+                ClickDigit('');
+                window.event.cancelBubble = true;
+                if (event.stopPropagation) event.stopPropagation();
+                return false;
+            }
+            else
+            {
+                IncompleteEntry();
+            }
+        }
+        else if (window.event && window.event.keyCode >= key_Zero && window.event.keyCode <= key_Nine)
+        {
+            // if there are already 9 numbers then this is the 10th...
+            if (txtPhone.value.length >= 9)
+            {
+                ClickDigit(String.fromCharCode(event.keyCode));
+            }
+        }
+    }
+
+    function ClickDigit(digit) {
+        txtPhone.focus();
+        if (parseInt(digit) >= 0) {
+            txtPhone.value = txtPhone.value + digit;
+        }
+
+        // once the person has entered all ten digits, submit by navigating to the
+        // same page with the digits in the txtPhone name/value pair.
+        if (txtPhone.value.length >= maxDigits) {
+            Search();
+
+            button.click();
+            txtPhone.disabled = true;
+            button.disabled = true;
+        }
+
+        return false;
+    }
+
+    function ClearDigit()
+    {
+        txtPhone.value = txtPhone.value.substring(0, txtPhone.value.length - 1);
+        txtPhone.focus();
+    }
+
+    function ClearAll()
+    {
+        txtPhone.value = '';
+        label.innerHTML = '&nbsp;';
+        div = document.getElementById("ScrollArea");
+        div.innerHTML = '';
+        txtPhone.focus();
+
+        return false;
+    }
+
+    function IncompleteEntry()
+    {
+        label.innerHTML = 'Please enter all ' + maxDigits + ' digits.';
+        label.style.color = 'red';
+    }
+
+    function Search()
+    {
+        div = document.getElementById("ScrollArea");
+        div.innerHTML = '';
+        label.innerHTML = 'Searching...';
+        label.style.color = '#1B4472';
+
+        return true;
+    }
+</script>
+
+<asp:UpdatePanel ID="upCheckin" runat="server" UpdateMode="Always">
+    <ContentTemplate>
+        <div class="container" onclick="resetTimer()" onkeypress="resetTimer()">
+            <asp:Panel ID="pnlError" runat="server" Visible="false">
+                <asp:Label ID="lblError" runat="server" CssClass="errorText" />
+            </asp:Panel>
+                  
+            <!-- Begin Views -->
+            
+            
+            <asp:Panel ID="pnlInit" runat="server" DefaultButton="btnScan" CssClass="initView">
+            <!-- Init State -->
+                <asp:Panel ID="pnlSwipeCard" runat="server" CssClass="footer">
+                    <div id="divLeftFooter" runat="server" class="footerLeft">
+                        <div id="divScanBox" runat="server" visible="false" style="float: left; width: 1px;">
+                            <asp:textbox id="tbScan" tabIndex="0" runat="server" Font-Size="1pt" BackColor="#222222" ForeColor="#222222" BorderStyle="None" MaxLength="12" Width="1pt" />
+                            <asp:Button ID="btnScan" runat="server" OnClick="btnScan_Click" Width="1" />
+                        </div>
+                        <div id="divScanNow" runat="server" visible="false" style="float: left;">
+	                        <asp:Label ID="lblScanNow" runat="server" />
+	                    </div>
+	                </div>
+	                <div id="divRightFooter" runat="server" class="footerRight">
+                        <asp:Button id="btnSearchByPhone" CssClass="searchButton" style="vertical-align: middle" runat="server" Visible="false" Text="Search By Phone" 
+                            OnClick="btnSearchByPhone_Click" />
+                    </div>
+                    <div id="divWideFooter" runat="server" visible="false" class="footerWide">
+                        <p><asp:Label ID="lblWideFooter" runat="server" /></p>
+                    </div>
+                    <div id="divTimer" runat="server" visible="false" class="footerWide" style="text-align: left;">
+                            <asp:Label id="lblTimeRemaining" Runat="server" CssClass="footerText" />
+                        </div>
+                </asp:Panel>
+            </asp:Panel>
+            
+            
+            <asp:Panel ID="pnlFamilySearch" runat="server" DefaultButton="btnFamilySearch">
+            <!-- Family Search State -->
+                <asp:Panel ID="pnlPhoneSearch" runat="server" CssClass="container">
+                    <div class="phonePanel" style="text-align:center; padding-top:10px;">
+                        <div class="heading">
+                            <h3 class="checkinText">Enter Phone #</h3>
+                        </div>
+                        <br />
+	                    <table style="border: none;">
+		                    <tr>
+			                    <td style="vertical-align: top;">
+				                    <table id="Table2" style="height: 302px; width: 286px; border: none; padding: 2px;" cellspacing="0">
+					                    <tr style="vertical-align: top;">
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '1' )" type="button" value="1"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '2' )" type="button" value="2"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '3' )" type="button" value="3"></td>
+					                    </tr>
+					                    <tr style="vertical-align: middle;">
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '4' )" type="button" value="4"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '5' )" type="button" value="5"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '6' )" type="button" value="6"></td>
+					                    </tr>
+					                    <tr style="vertical-align: middle;">
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '7' )" type="button" value="7"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '8' )" type="button" value="8"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '9' )" type="button" value="9"></td>
+					                    </tr>
+					                    <tr style="vertical-align: middle;">
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClearDigit( )" type="button" value="<"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '0' )" type="button" value="0"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClearAll()" type="button" value="clr"></td>
+					                    </tr>
+				                    </table>
+				                    <p>&nbsp;</p>
+				                    <p>&nbsp;</p>
+			                    </td>
+			                    <td style="vertical-align: top; padding-left: 20px">
+				                    <p><div style="width: 100%;">
+				                            <div style="width: 334px; float: left;" onkeypress="javascript:return FireDefaultButton(event,'btnFamilySearch')">
+				                                <asp:textbox id="txtPhone" runat="server" CssClass="phoneText" Width="334" Height="75" MaxLength="10" />
+				                            </div>
+				                            <div style="width: 212px; float: left; margin-left: 15px;">
+				                                <asp:button id="btnFamilySearch" runat="server" CssClass="phoneSearch" Text="Search" OnClick="btnFamilySearch_Click" />
+				                            </div>
+				                        </div>
+				                        <br />
+					                    <asp:Label id="lblMessage" runat="server" CssClass="checkinText" /></p>
+				                    <div class="scrollArea" id="ScrollArea">
+				                        <asp:datalist id="dgFamilies" runat="server" RepeatColumns="1" CellSpacing="5" DataKeyField="FamilyID" 
+				                            OnSelectedIndexChanged="dgFamilies_SelectedIndexChanged" OnItemDataBound="dgFamilies_ItemDataBound">
+						                    <ItemTemplate>
+							                    <asp:Button runat="server" ID="FamilyID" CommandName="Select" CausesValidation="false" CssClass="nameButton" />
+						                    </ItemTemplate>
+					                    </asp:datalist>
+					                </div>
+			                    </td>
+		                    </tr>
+	                    </table>
+                    </div>
+                    <div class="footer">
+	                    <div class="footerLeft">
+		                        <asp:button id="btnFamilySearchCancel" CssClass="cancelButton" runat="server" Text="Cancel" OnClick="Cancel_Click" />
+	                        </div>
+                        </div>
+                </asp:Panel>
+                <script type="text/javascript">
+                    txtPhone = document.getElementById( '<%= txtPhone.ClientID %>' );
+                    txtPhone.focus();
+                </script>
+            </asp:Panel>
+
+            
+            <asp:Panel ID="pnlSelectFamilyMember" runat="server">
+            <!-- Select Family Member State -->
+                <div style="text-align: center; width: 100%;">
+                    <div class="heading">
+                        <p class="checkinText"><asp:Label ID="lblFamilyName" runat="server" /></p>
+                        <h3 class="checkinText">Select All Children Attending Today</h3>
+                    </div>
+                    <div class="scrollAreaBig">
+	                    <asp:DataList id="dgFamilyMembers" runat="server" DataKeyField="PersonID" 
+		                    CellSpacing="5" RepeatColumns="1" BorderColor="Black" BorderWidth="0" Width="353"
+		                    onselectedindexchanged="dgFamilyMembers_SelectedIndexChanged" OnItemDataBound="dgFamilyMembers_ItemDataBound" 
+		                    ItemStyle-HorizontalAlign="Left" GridLines="Both">
+                            <ItemStyle HorizontalAlign="Left"></ItemStyle>
+		                    <ItemTemplate>
+		                        <div style="width: 338px;">
+		                            <div style="width: 263px; height: 91px; text-align: left; float: left;">
+			                            <asp:Button runat="server" ID="btnPerson" Text='<%# DataBinder.Eval(Container, "DataItem.FirstName") %>' 
+			                                CommandArgument='<%# DataBinder.Eval(Container, "DataItem.PersonID") %>' CommandName="Select" CausesValidation="false" 
+			                                CssClass="dataButton" >
+			                            </asp:Button>
+			                        </div>
+			                        <div style="width: 75px; height: 47px; float: left;"><asp:Image id="imgChecked" runat="server" CssClass="dataStar" ImageUrl="images/empty_star2.png" /></div>
+			                    </div>
+		                    </ItemTemplate>
+	                    </asp:DataList>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <div class="footerLeft">
+                <asp:Button ID="btnSelectFamilyMemberCancel" runat="server" Text="Cancel" 
+		                CssClass="cancelButton" onclick="Cancel_Click"  style="margin-right: 20px;"/>
+		            </div>
+		            <div class="footerRight">
+                        <asp:Button ID="btnSelectFamilyMemberContinue" runat="server" Text="Next" CssClass="nextButton" 
+                            onclick="btnSelectFamilyMemberContinue_Click"/>
+		            </div>
+                </div>
+            </asp:Panel>
+            
+            
+            <asp:Panel ID="pnlNoEligiblePeople" runat="server">
+            <!-- No Young Children State -->
+                <asp:Label ID="lblNoEligiblePeople" runat="server" CssClass="errorText" Visible="false" />
+                <div class="footer">
+	                <div class="footerLeft">
+		                <asp:button id="btnNoPeopleCancel" CssClass="cancelButton" runat="server" Text="Cancel" OnClick="Cancel_Click" />
+	                </div>
+                </div>
+            </asp:Panel>
+
+            
+            <asp:Panel ID="pnlSelectAbility" runat="server">
+            <!-- Select Ability State -->
+                <div style="text-align: center;">
+                    <div class="heading">
+	                    <h3 class="checkinText"><asp:Label ID="lblPersonName" runat="server" /></h3>
+	                </div>
+	                <asp:DataList id="dgAbilities" runat="server" DataKeyField="LookupID" 
+		                CellSpacing="5" RepeatColumns="1" BorderColor="Black" 
+		                onselectedindexchanged="dgAbilities_SelectedIndexChanged" ItemStyle-HorizontalAlign="Left">
+		                <ItemTemplate>
+			                <asp:Button runat="server" ID="lookupID" Text='<%# DataBinder.Eval(Container, "DataItem.Value") %>' 
+			                    CommandArgument='<%# DataBinder.Eval(Container, "DataItem.LookupID") %>' CommandName="Select" 
+			                    CausesValidation="false" CssClass="nameButton" />
+			                <asp:Image ID="imgChecked" runat="server" ImageUrl="images/star.png" Visible="false" CssClass="star" />
+		                </ItemTemplate>
+	                </asp:DataList>
+                </div>
+
+                <div class="footer">
+                    <div class="footerLeft">
+                        <asp:Button ID="btnAbilityCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" />
+                    </div>
+                </div>
+            </asp:Panel>
+
+            
+            <asp:Panel ID="pnlSelectService" runat="server">
+            <!-- Select Service State -->
+                <div style="text-align: center;">
+                    <div class="heading">
+                        <h3 class="checkinText">Select Services</h3>
+                    </div>
+                    <asp:DataList ID="dgEventTimes" runat="server" CellSpacing="5" RepeatColumns="1" BorderColor="Black" BorderWidth="0" Width="350" 
+                        OnSelectedIndexChanged="dgEventTimes_SelectedIndexChanged" OnItemDataBound="dgEventTimes_ItemDataBound" ItemStyle-HorizontalAlign="Left">
+                        <ItemTemplate>
+                            <div class="item">
+                                <asp:Button runat="server" ID="btnService" CommandName="Select" CausesValidation="false" CssClass="dataButton" /><asp:Image id="imgChecked" runat="server" CssClass="star" ImageUrl="images/empty_star2.png" />
+                            </div>
+                        </ItemTemplate>
+                    </asp:DataList>
+                </div>
+
+                <div class="footer">
+                    <div class="footerLeft">
+                        <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" />
+                    </div>
+                    <div class="footerRight">
+                        <asp:Button ID="btnServicesContinue" runat="server" Text="Next" CssClass="nextButton" onclick="btnServicesContinue_Click" />
+                    </div>
+                </div>
+            </asp:Panel>
+
+            
+            <asp:Panel ID="pnlConfirm" runat="server">
+            <!-- Confirm State -->
+                <div style="text-align: center;">
+                    <div class="heading">
+                        <h3 class="checkinText">Confirm</h3>
+                    </div>
+                        <div class="scrollAreaBig"><asp:PlaceHolder ID="phConfirm" runat="server" /></div>
+                        <div id="divConfirmError" runat="server" visible="false">
+                            <p><asp:Label ID="lblConfirmError" runat="server" CssClass="errorCaption" /></p>
+                        </div>
+                    <div class="footer">
+                        <div class="footerLeft">
+                            <asp:Button ID="btnConfirmCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" />
+                        </div>
+                        <div class="footerRight">
+                            <asp:Button ID="btnConfirmContinue" runat="server" Text="Next" CssClass="nextButton" onclick="btnConfirmContinue_Click" />
+		                </div>
+                    </div>
+                </div>
+            </asp:Panel>
+
+            
+            <asp:Panel ID="pnlResults" runat="server">
+            <!-- Result State -->
+                <div style="text-align: center;">
+                    <div class="heading">
+                        <h3 class="checkinText">Thank You!</h3>
+                        <asp:PlaceHolder ID="phResults" runat="server" />
+                    </div>
+                </div>
+                <div class="footer">
+                    <div class="footerRight">
+                        <asp:Button ID="btnResultsContinue" runat="server" Text="Finish" CssClass="nextButton" onclick="btnResultsContinue_Click" />
+                    </div>
+                </div>
+            </asp:Panel>
+            
+            
+            <asp:Panel ID="pnlBadKiosk" runat="server">
+            <!-- Bad Kiosk State -->
+                <div class="heading">
+                    <h3 class="checkinText">Error!</h3>
+                    <asp:Label ID="lblBadKiosk" runat="server" CssClass="errorText" />
+                </div>
+                <div class="footer">
+                    <div class="footerLeft">
+                        <asp:Button ID="btnTryAgain" runat="server" Text="Retry" CssClass="cancelButton" onclick="btnTryAgain_Click"  />
+		            </div>
+                </div>
+            </asp:Panel>
+
+
+            <!-- End Views -->
+            <asp:Button ID="btnRedirect" runat="server" OnClick="Redirect_Click" Width="1" Height="1" />
+        </div>
+    </ContentTemplate>
+</asp:UpdatePanel>

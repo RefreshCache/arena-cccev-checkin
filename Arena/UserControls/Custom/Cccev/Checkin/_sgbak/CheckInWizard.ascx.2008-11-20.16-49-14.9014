@@ -1,0 +1,59 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="CheckInWizard.ascx.cs" Inherits="ArenaWeb.UserControls.Custom.Cccev.Checkin.CheckInWizard" %>
+
+<asp:UpdatePanel ID="upCheckin" runat="server" UpdateMode="Conditional">
+    <ContentTemplate>
+    
+        <asp:Panel ID="pnlTitle" runat="server">
+            <asp:Label ID="lblTitle" runat="server" CssClass="formTitle" /><br />
+            <asp:Label ID="lblSubTitle" runat="server" CssClass="formSubTitle" />
+        </asp:Panel>
+    
+        <!-- Begin Views -->
+
+        <asp:Panel ID="pnlInit" runat="server">
+            <div style="text-align: center">
+                <asp:Label id="lblTimeRemaining" Visible="false" Runat="server" CssClass="CountDown" />
+            </div>
+            <asp:panel id="pnlSwipeCard" runat="server" Visible="false">
+		        <span class="ButtonText" style="vertical-align: middle"><%= ScanNowMessageSetting %></span>&nbsp;
+		        <asp:Button id="btnSearchByPhone" CssClass="SmallButtonText" style="vertical-align: middle" runat="server" Visible="false" Text="Search By Phone" />
+	        </asp:panel>
+	        <asp:textbox id="tbScan" tabIndex="0" runat="server" Font-Size="1pt" BackColor="White" ForeColor="White" BorderStyle="None" MaxLength="12" Width="1pt" />
+        </asp:Panel>
+        
+        <asp:Panel ID="pnlScan" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlFamilySearch" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlFamilyNotFound" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlSelectFamilyMember" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlSelectAbility" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlSelectService" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlServiceNotFound" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlConfirm" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlSuccess" runat="server">
+        </asp:Panel>
+
+        <asp:Panel ID="pnlFailure" runat="server">
+        </asp:Panel>
+
+        <!-- End Views -->
+    
+    </ContentTemplate>
+    <Triggers>
+    </Triggers>
+</asp:UpdatePanel>

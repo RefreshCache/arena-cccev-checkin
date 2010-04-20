@@ -1,0 +1,268 @@
+/**********************************************************************
+* Description: Script to use when installing the CCCEV Arena Childrens
+*              check-in module.
+* Created By:  Nick Airdo @ Central Christian Church of the East Valley
+*              Jason Offutt @ Central Christian Church of the East Valley
+* Date Created:	1/12/2009 10:16 AM
+*
+* $Workfile: CccevArenaCheckInInstall.sql $
+* $Revision: 2 $ 
+* $Header: /trunk/Database/Scripts/cust/Cccev/ckin/CccevArenaCheckInInstall.sql   2   2009-02-16 17:55:28-07:00   nicka $
+* 
+* $Log: /trunk/Database/Scripts/cust/Cccev/ckin/CccevArenaCheckInInstall.sql $
+*  
+*  Revision: 2   Date: 2009-02-17 00:55:28Z   User: nicka 
+*  
+*  Revision: 1   Date: 2009-01-14 00:19:31Z   User: nicka 
+**********************************************************************/
+DECLARE @OrganizationID int
+SET @OrganizationID = 1
+
+DECLARE @CheckinAttrGroupGuid uniqueidentifier
+SET @CheckinAttrGroupGuid = 'fe30ac51-5b67-44a5-9d73-a7d3c63a7e9e'
+
+DECLARE @CheckinAttrGroupID int
+SELECT @CheckinAttrGroupID = attribute_group_id FROM core_attribute_group WHERE @CheckinAttrGroupGuid = guid
+
+DECLARE @CurrentUser varchar(50)
+SELECT @CurrentUser = SYSTEM_USER
+
+DECLARE @LegalAttrGuid uniqueidentifier
+SET @LegalAttrGuid = '4a437f23-9bac-443d-82cd-4093e7ae3779'
+
+DECLARE @HealthAttrGuid uniqueidentifier
+SET @HealthAttrGuid = '4c0e69a8-db55-428a-86f7-5fcf40647f1d'
+
+DECLARE @SpecialNeedsAttrGuid uniqueidentifier
+SET @SpecialNeedsAttrGuid = '48cb5d61-10c6-4d86-95d5-927ce5376d64'
+
+DECLARE @SelfCheckoutAttrGuid uniqueidentifier
+SET @SelfCheckoutAttrGuid = 'd19c5bf2-cb04-4f4f-a839-5facf5dbe796'
+
+DECLARE @AbilityLevelAttrGuid uniqueidentifier
+SET @AbilityLevelAttrGuid = '98467444-df8d-40aa-9d11-1119e40d6e6c'
+
+DECLARE @AbilityLevelLookupTypeGuid uniqueidentifier
+SET @AbilityLevelLookupTypeGuid = 'b242694f-13dd-4eb9-9d03-6b58e62f11ec'
+
+-- Here are the 4 Ability Level lookups that Jason has on his system
+DECLARE @AbilityLevelInfant uniqueidentifier
+SET @AbilityLevelInfant = '03a15683-bc72-4fe4-b47e-60dca63684e3'
+
+DECLARE @AbilityLevelCrawler uniqueidentifier
+SET @AbilityLevelCrawler = 'db36f2ed-7c7e-457c-9cc8-bbded00ddfd7'
+
+DECLARE @AbilityLevelWalkingConfidently uniqueidentifier
+SET @AbilityLevelWalkingConfidently = '983324ad-9311-4ca2-a69d-fa851cbbdac6'
+
+DECLARE @AbilityLevelPottyTrained uniqueidentifier
+SET @AbilityLevelPottyTrained = 'caafbc06-f9b8-43ce-b778-3cdd1045023c'
+
+-- This is used with the Arena.Core.Bone utility classes:
+DECLARE @OccurrenceTypeAttributeEntityTypeGUID uniqueidentifier
+SET @OccurrenceTypeAttributeEntityTypeGUID = 'b8903b32-3200-41e3-8c08-66c372a38d12'
+
+-- This is a system lookup
+DECLARE @EntityLookupID int
+SELECT @EntityLookupID = lookup_type_id FROM core_lookup_type WHERE guid = '15fe6acd-f986-4a92-9410-75eb67e531a6'
+
+--------------------------------------------------------------------------
+-- Add the Occurrence Type Attribute to the list of Entity lookup
+--------------------------------------------------------------------------
+
+IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @OccurrenceTypeAttributeEntityTypeGUID)
+BEGIN
+INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
+     VALUES (@OccurrenceTypeAttributeEntityTypeGUID, @EntityLookupID, 'Occurrence Type Attribute', '', '', '', '', '', '', '', '', 1, 1, 0, NULL)
+END
+
+--------------------------------------------------------------------------
+-- Lookup Type: Ability Level
+-- Add the 'Ability Level' Lookup Type into the core_lookup_type table
+--------------------------------------------------------------------------
+IF NOT EXISTS (SELECT * FROM core_lookup_type WHERE guid = @AbilityLevelLookupTypeGuid)
+BEGIN
+INSERT INTO core_lookup_type
+           ([guid]
+           ,[lookup_type_name]
+           ,[lookup_type_desc]
+           ,[lookup_category]
+           ,[qualifier_1_title]
+           ,[qualifier_2_title]
+           ,[organization_id]
+           ,[system_flag]
+           ,[qualifier_3_title]
+           ,[qualifier_4_title]
+           ,[qualifier_5_title]
+           ,[qualifier_6_title]
+           ,[qualifier_7_title]
+           ,[qualifier_8_title])
+     VALUES
+           (@AbilityLevelLookupTypeGuid
+           ,'Ability Level'
+           ,'Check-in Ability Level'
+           ,''
+           ,''
+           ,''
+           ,@OrganizationID
+           ,0
+           ,''
+           ,''
+           ,''
+           ,''
+           ,''
+           ,'')
+END
+
+DECLARE @AbilityLevelTypeLookupID int
+SELECT @AbilityLevelTypeLookupID = lookup_type_id FROM core_lookup_type WHERE @AbilityLevelLookupTypeGuid = guid
+
+--------------------------------------------------------------------------
+-- Add the 4 default Ability Level Lookups (Infant, Crawler, etc.)
+--------------------------------------------------------------------------
+
+-- Infant
+IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @AbilityLevelInfant)
+BEGIN
+INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
+     VALUES (@AbilityLevelInfant, @AbilityLevelTypeLookupID, 'Infant', '', '', '', '', '', '', '', '', 1, 1, 0, NULL)
+END
+
+-- Crawler
+IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @AbilityLevelCrawler)
+BEGIN
+INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
+     VALUES (@AbilityLevelCrawler, @AbilityLevelTypeLookupID, 'Crawler', '', '', '', '', '', '', '', '', 2, 1, 0, NULL)
+END
+
+-- Walker
+IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @AbilityLevelWalkingConfidently)
+BEGIN
+INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
+     VALUES (@AbilityLevelWalkingConfidently, @AbilityLevelTypeLookupID, 'Walking Confidently', '', '', '', '', '', '', '', '', 3, 1, 0, NULL)
+END
+
+-- Potty Trained
+IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @AbilityLevelPottyTrained)
+BEGIN
+INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
+     VALUES (@AbilityLevelPottyTrained, @AbilityLevelTypeLookupID, 'Potty Trained', '', '', '', '', '', '', '', '', 4, 1, 0, NULL)
+END
+
+--------------------------------------------------------------------------
+-- Attribute: Ability Level
+-- Add the attribute to the core_attribute table that will hold each
+-- child's "ability level" value.
+--------------------------------------------------------------------------
+IF NOT EXISTS (SELECT * FROM core_attribute WHERE guid = @AbilityLevelAttrGuid)
+BEGIN
+INSERT INTO core_attribute
+           ([guid]
+           ,[date_created]
+           ,[date_modified]
+           ,[created_by]
+           ,[modified_by]
+           ,[attribute_group_id]
+           ,[attribute_name]
+           ,[attribute_type]
+           ,[attribute_order]
+           ,[visible]
+           ,[required]
+           ,[type_qualifier]
+           ,[readonly]
+           ,[system_flag])
+     VALUES
+           (@AbilityLevelAttrGuid
+           ,GetDate()
+           ,GetDate()
+           ,@CurrentUser
+           ,@CurrentUser
+           ,@CheckinAttrGroupID
+           ,'Ability Level'
+           ,3
+           ,-1
+           ,1
+           ,0
+           ,CAST(@AbilityLevelTypeLookupID AS varchar(100))
+           ,0
+           ,0)
+END
+
+--------------------------------------------------------------------------
+-- Attribute: Special Needs
+-- Add the attribute to the core_attribute table that will hold each
+-- child's "special needs" value.
+--------------------------------------------------------------------------
+IF NOT EXISTS (SELECT * FROM core_attribute WHERE guid = @SpecialNeedsAttrGuid)
+BEGIN
+INSERT INTO core_attribute
+           ([guid]
+           ,[date_created]
+           ,[date_modified]
+           ,[created_by]
+           ,[modified_by]
+           ,[attribute_group_id]
+           ,[attribute_name]
+           ,[attribute_type]
+           ,[attribute_order]
+           ,[visible]
+           ,[required]
+           ,[type_qualifier]
+           ,[readonly]
+           ,[system_flag])
+     VALUES
+           (@SpecialNeedsAttrGuid
+           ,GetDate()
+           ,GetDate()
+           ,@CurrentUser
+           ,@CurrentUser
+           ,@CheckinAttrGroupID
+           ,'Special Needs'
+           ,4
+           ,-1
+           ,1
+           ,0
+           ,''
+           ,0
+           ,0)
+END
+
+--------------------------------------------------------------------------
+-- Attribute: Self Check-out
+-- Add the attribute to the core_attribute table that will hold each
+-- child's "self check-out" value.
+--------------------------------------------------------------------------
+IF NOT EXISTS (SELECT * FROM core_attribute WHERE guid = @SelfCheckoutAttrGuid)
+BEGIN
+INSERT INTO core_attribute
+           ([guid]
+           ,[date_created]
+           ,[date_modified]
+           ,[created_by]
+           ,[modified_by]
+           ,[attribute_group_id]
+           ,[attribute_name]
+           ,[attribute_type]
+           ,[attribute_order]
+           ,[visible]
+           ,[required]
+           ,[type_qualifier]
+           ,[readonly]
+           ,[system_flag])
+     VALUES
+           (@SelfCheckoutAttrGuid
+           ,GetDate()
+           ,GetDate()
+           ,@CurrentUser
+           ,@CurrentUser
+           ,@CheckinAttrGroupID
+           ,'Self Check-Out?'
+           ,4
+           ,-1
+           ,1
+           ,0
+           ,''
+           ,0
+           ,0)
+END
+

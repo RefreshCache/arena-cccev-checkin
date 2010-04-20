@@ -1,0 +1,506 @@
+﻿/*
+* $Revision: $
+* $Date:  $ 
+*/
+html
+{
+	overflow: hidden;
+}
+
+body
+{
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+}
+
+.container
+{
+	width: 1024px;
+	height: 768px;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/checkin_bg.png);
+	background-repeat: no-repeat;
+}
+
+.view
+{
+	width: 1024px;
+	height: 768px;
+	vertical-align: top;
+	text-align: center;
+}
+
+.initView
+{
+	width: 1024px;
+	height: 768px;
+	vertical-align: bottom;
+}
+
+div.heading
+{
+	border: none;
+	text-align: center;
+	padding: 20px;
+}
+
+div.footer
+{
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/footer_bg.png);
+	background-repeat: no-repeat;
+	width: 1024px;
+	height: 118px;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+
+.invis
+{
+	visibility: hidden;
+}
+
+.footerText
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #FFFFFF;
+	font-size: 32pt;
+	display: block;
+	margin: 40px 0 0 20px;
+    padding-bottom: 25px;
+}
+
+.footerCaption
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #FFFFFF;
+	font-size: 24pt;
+	display: block;
+	margin: 40px 0 0 20px;
+    padding-bottom: 25px;
+}
+
+.footerError
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	text-decoration: underline;
+	color: #FFFFFF;
+	font-size: 32pt;
+	display: block;
+	margin: 40px 0 0 20px;
+    padding-bottom: 25px;
+}
+
+.footerLeft
+{
+	float: left;
+	width: 500px;
+	height: 118px;
+	text-align: left;
+}
+
+.footerRight
+{
+	float: right;
+	width: 500px;
+	text-align: right;
+}
+
+.footerWide
+{
+	width: 1024px;
+	height: 118px;
+	text-align: center;
+}
+
+.checkinText
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 36pt;
+	color: #000000;
+}
+
+h3.checkinText
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 48pt;
+	color: #000000;
+	border: none;
+}
+
+.confirmText
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 36pt;
+	color: #000000;
+}
+
+.classroomText
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 36pt;
+	color: #009900;
+	
+	filter: Shadow(Color=#000000, Direction=135, Strength=5);
+}
+
+.errorText
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 36pt;
+	color: #CC0000;
+	margin: 20px;
+	padding-bottom: 20px;
+	padding-top: 20px;
+	display: block;
+}
+
+.checkinCaption
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-weight: normal;
+	font-size: 24pt;
+	color: #444444;
+	border: none;
+}
+
+.errorCaption
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-weight: normal;
+	font-size: 18pt;
+	color: #CC0000;
+	border: none;
+}
+
+.confirmError
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 36pt;
+	color: #CC0000;
+}
+
+.phonePanel
+{
+	overflow: auto;
+}
+
+input.phoneButton
+{
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/phone_button.png);
+	background-color: Transparent;
+	border: none;
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 32pt;
+	color: #FFFFFF;
+	height: 77px;
+	width: 95px;
+	padding: 5px;
+}
+
+.scrollArea
+{
+	height: 300px;
+	width: 550px;
+	overflow: auto;
+	
+	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
+	scrollbar-face-color: #000000;
+	scrollbar-highlight-color: #888888;
+	scrollbar-shadow-color: #000000;
+	scrollbar-3dlight-color: #888888;
+	scrollbar-arrow-color: #CCFFFF;
+	scrollbar-track-color: #999999;
+	scrollbar-darkshadow-color: #000000;
+	
+}
+
+.scrollAreaBig
+{
+	height: 420px;
+	width: 1024px;
+	overflow: auto;
+	
+	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
+	scrollbar-face-color: #000000;
+	scrollbar-highlight-color: #888888;
+	scrollbar-shadow-color: #000000;
+	scrollbar-3dlight-color: #888888;
+	scrollbar-arrow-color: #CCFFFF;
+	scrollbar-track-color: #999999;
+	scrollbar-darkshadow-color: #000000;
+}
+
+.resultScrollArea
+{
+	height: 450px;
+	width: 1024px;
+	overflow: auto;
+	
+	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
+	scrollbar-face-color: #000000;
+	scrollbar-highlight-color: #888888;
+	scrollbar-shadow-color: #000000;
+	scrollbar-3dlight-color: #888888;
+	scrollbar-arrow-color: #CCFFFF;
+	scrollbar-track-color: #999999;
+	scrollbar-darkshadow-color: #000000;
+}
+
+input.dataButton
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #FFFFFF;
+	font-size: 28pt;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/button_active.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	border: none;
+	width: 263px;
+	height: 91px;
+}
+
+input.dataButtonInactive
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #FFFFFF;
+	font-size: 28pt;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/button_inactive.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	border: none;
+	width: 263px;
+	height: 91px;
+}
+
+input.dataButtonSelected
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #FFFFFF;
+	font-size: 28pt;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/button_selected.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	border: none;
+	width: 263px;
+	height: 91px;
+}
+
+input.nameButton
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #FFFFFF;
+	font-size: 20pt;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/name_button.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	border: none;
+	width: 350px;
+	height: 91px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+input.nextButton
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #000000;
+	font-size: 30pt;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/next_button5.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	border: none;
+	width: 216px;
+	height: 118px;
+	padding-right: 30px;
+	margin-right: 50px;
+	
+}
+
+input.nextButtonInactive
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #444444;
+	font-size: 30pt;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/next_button4.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	border: none;
+	width: 216px;
+	height: 118px;
+	padding-right: 30px;
+	margin-right: 50px;
+}
+
+input.phoneSearch
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 28pt;
+	color: #000000;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/phone_search3.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	width: 212px;
+	height: 75px;
+	border: none;
+	padding-right: 30px;
+	padding-bottom: 7px;
+}
+
+input.phoneText
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 30pt;
+	color: #000000;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/text_box.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	border: none;
+	height: 75px;
+	width: 334px;
+	padding: 10px 0 0 70px;
+	
+}
+
+input.cancelButton
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 30pt;
+	color: #000000;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/cancel_button.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	margin-left: 50px;
+	border: none;
+	height: 118px;
+	width: 177px;
+}
+
+input.searchButton
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	color: #000000;
+	font-size: 32pt;
+	margin-right: 20px;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/search_button.png);
+	background-color: Transparent;
+	border: none;
+	width: 420px;
+	height: 118px;
+	padding-top: 20px;
+	
+}
+
+.dataStar
+{
+	margin-left: 10px;
+	margin-right: 30px;
+	margin-top: 20px;
+}
+
+.star
+{
+	margin-left: 15px;
+	margin-bottom: 20px;
+}
+
+.resultTable
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 36pt;
+	color: #000000;
+}
+
+table.resultTable
+{
+	width: 950px;
+	border: none;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+td.resultTable
+{
+	text-align: left;
+	padding-right: 20px;
+	padding-bottom: 10px;
+}
+
+.success
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 36pt;
+	color: green;
+}
+
+td.success
+{
+	height: 48px;
+	width: 48px;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/images/checkmark.png);
+	background-color: Transparent;
+	background-repeat: no-repeat;
+}
+
+.fail
+{
+	font-family: "Cooper Black", "Cooper Black BT";
+	font-size: 36pt;
+	color: #FFFFFF;
+}
+
+td.fail
+{
+	background-color: #CC0000;
+	padding-left: 10px;
+}
+
+/***********************************************
+ * This is the original class which is included
+ * in the Arena.css
+ ***********************************************
+.ajaxProgress
+{
+	background-color: #e5e3e4;
+	padding: 5px;
+	color: #000;
+	font-family: Arial;
+	font-size: 10pt;
+	font-weight: 700;
+	opacity:.50;
+	filter: alpha(opacity=50); 
+	-moz-opacity: 0.5;
+	height: 18px;
+	width: 80px;
+	text-align: center;
+}
+*/
+
+.ajaxProgress
+{
+	margin-left: auto ;
+	margin-right: 0 ;
+}
+
+.ajaxLargeProgress
+{
+	background-color: #000;
+	
+	padding: 0px;
+	color: #000;
+	font-family: Arial;
+	font-size: 30pt;
+	font-weight: normal;
+	opacity:.50;
+	filter: alpha(opacity=50); 
+	-moz-opacity: 0.5;
+	text-align: center;
+	margin-left: auto ;
+	margin-right: auto ;
+	background-image: url( '/Arena/UserControls/Custom/Cccev/Checkin/images/big_roller.gif');
+	background-position: 50%;
+	background-repeat: no-repeat;
+	position: absolute;
+	width: 1024px;
+	height: 768px;
+}
