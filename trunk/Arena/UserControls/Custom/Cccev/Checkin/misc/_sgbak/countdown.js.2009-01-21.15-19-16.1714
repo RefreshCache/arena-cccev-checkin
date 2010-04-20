@@ -1,0 +1,47 @@
+/* Simply set StartTime to a date time */
+/* Example:
+<script language="JavaScript">
+StartTime = "5/5/2005 4:00 PM";
+</script>
+<script language="JavaScript" src="countdown.js"></script>
+*/
+function CalcAge(secs, num1, num2)
+{
+	s = ((Math.floor(secs/num1))%num2).toString();
+	if (s.length < 2)
+	{
+		s = "0" + s;
+	}
+	return s;
+}
+
+function Ticker(secs, pageID)
+{
+	if ( secs < 0 )
+	{
+	    window.location = "default.aspx?page=" + pageID;
+	}
+	else
+	{
+		document.getElementById("CountDown").innerHTML = 
+						CalcAge(secs, 3600, 24) + ":" +
+						CalcAge(secs, 60, 60) + ":" +
+						CalcAge(secs, 1, 60);
+
+		setTimeout("Ticker(" + (secs - 1) + ", " + pageID + ")", 990);
+		
+	}
+}
+
+function StartTimer(pageID) 
+{
+    if (!(typeof (StartTime) == "undefined" && typeof (NowTime) == "undefined")) {
+        document.write("<span id='CountDown' class='CountDown'></span>");
+        
+        var startTime = new Date(StartTime);
+        var rightNow = new Date(NowTime);
+        ddiff = new Date(startTime - rightNow);
+        gsecs = Math.floor(ddiff.valueOf() / 990);
+        Ticker(gsecs, pageID);
+    }
+}

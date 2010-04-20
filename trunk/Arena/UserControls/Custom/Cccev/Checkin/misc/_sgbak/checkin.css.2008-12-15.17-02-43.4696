@@ -1,0 +1,201 @@
+﻿body
+{
+	font-family: Tahoma, Helvetica, sans-serif;
+	background-color: #FFFFFF;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.MainArea
+{
+	text-align: center;
+	vertical-align: middle;
+	height: 400px;
+}
+
+.CountDown 
+{
+	font-size: 33px;
+	text-align: center;
+}
+
+/* The main, large text title of the page                 */
+/* such as Welcome, Search By Phone, Scan Now, etc.       */
+.PageTitle
+{
+    font-family: Cooper Blk BT, Verdana, Helvetica, sans-serif;
+    font-size: 54px;
+    line-height: normal;
+    color: #1B4472;
+}
+
+.Instructions
+{
+    font-family: Tahoma, Helvetica, sans-serif;
+    font-size: 32px;
+    line-height: normal;
+    color: #FFFFFF;
+}
+
+.SubInstructions
+{
+	font-family: Tahoma, Helvetica, sans-serif;
+    font-size: 32px;
+    line-height: normal;
+    color: #1B4472;
+}
+
+.ButtonText
+{
+    font-family: Tahoma, Helvetica, sans-serif;
+    font-size: 40px;
+    height: 64px;
+    line-height: normal;
+    color: #5555AA;
+}
+
+.SmallButtonText
+{
+	width: 450px;
+	height: 55px;
+    font-family: Arial, Tahoma, Verdana, Helvetica, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: normal;
+    border: medium windows-inset;
+    color: #5555AA;
+}
+
+input.WideButtonText
+{
+	border: 2px #7188B1;
+	height: 68px;
+	width: 450px;
+	color: white;
+	font-family: Verdana;
+	font-size: 16pt;
+	background-image:url(/Arena/UserControls/Custom/Cccev/Checkin/misc/button_sm_up.jpg);
+	text-align: center;
+	padding-left: 0px;
+	background-color: Gray;
+}
+
+input.Disabled
+{
+	filter: progid:DXImageTransform.Microsoft.BasicImage(opacity=0.40);
+	border: 2px #7188B1;
+	height: 68px;
+	width: 250px;
+	color: #f00;
+	font-family: Verdana;
+	font-size: 16pt;
+	background-image:url(/Arena/UserControls/Custom/Cccev/Checkin/misc/button_sm_up_disabled.jpg);
+	text-align: center;
+	/* padding-left: 35px; */
+	background-color: Gray;
+}
+
+input.SmallButtonText
+{
+	border: 2px #7188B1;
+	height: 68px;
+	width: 250px;
+	color: white;
+	font-family: Verdana;
+	font-size: 16pt;
+	background-image:url(/Arena/UserControls/Custom/Cccev/Checkin/misc/button_sm_up.jpg);
+	text-align: center;
+	/* padding-left: 35px; */
+	background-color: Gray;
+}
+
+.LeftBar
+{
+	float: left;
+	background-color: #EEEEFF;
+	width: 150px;
+	height: 600px;
+}
+
+.BottomBar
+{
+	clear: both;
+	position: fixed;
+	bottom: 0px;
+	background-color: #EEEEFF;
+	width: 100%;
+	height: 60px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.BottomButtons
+{
+	padding-right: 20px;
+	text-align: right;	
+}
+
+
+input.NameButton_Up
+{
+	border: outset 0px black;
+	height: 68px;
+	width: 570px;
+	color: white;
+	font-family: Verdana;
+	font-size: 16pt;
+	background-image:url(Images/name_button.png);
+	text-align: left;
+	padding-left: 35px;
+	background-color: Gray;
+}
+
+input.NameButton_Down
+{
+	border: outset 0px black;
+	height: 68px;
+	width: 570px;
+	color: white;
+	font-family: Verdana;
+	font-size: 16pt;
+	background-image:url(Images/name_button_down.png);
+	text-align: left;
+	padding-left: 45px;
+	background-color: Gray;
+}
+
+input.NumericButton_Up
+{
+	border: outset 0px black;
+	height: 77px;
+	width: 95px;
+	color: white;
+	font-size: 30pt;
+	background-image:url(images/numeric_button.png);
+	background-color: Gray;
+}
+
+/* Template Styles */
+.TemplateHeaderBackground 
+{
+	height: 175px;
+	background-image: url(/Arena/UserControls/Custom/Cccev/Checkin/misc/logo.jpg);
+	background-repeat: no-repeat;
+	background-position: left;
+	background-color: #64769c;
+	padding-left: 250px;
+}
+
+.ScrollArea
+{
+	height: 370px;
+	width: 550px;
+	overflow: auto;
+}
+
+.ListContentsHeader
+{
+	font-family: Verdana;
+	font-size: 16pt;
+	color: green;
+}
