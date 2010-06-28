@@ -4,10 +4,15 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInWizard.ascx.cs $
-* $Revision: 54 $ 
-* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   54   2010-01-20 15:43:25-07:00   JasonO $
+* $Revision: 55 $ 
+* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   55   2010-06-28 10:28:51-07:00   JasonO $
 * 
 * $Log: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs $
+*  
+*  Revision: 55   Date: 2010-06-28 17:28:51Z   User: JasonO 
+*  Bug Fix: If an occurrence attendance somehow existst (via multiple 
+*  checkins?) we'll now check whether the "Attended" bit is set to false 
+*  before allowing the family member to continue. 
 *  
 *  Revision: 54   Date: 2010-01-20 22:43:25Z   User: JasonO 
 *  Adding support for declaring print-provider at the module level. 
@@ -691,7 +696,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
                             OccurrenceAttendance oa = CheckInController.GetAttendance(occurrences.First().StartTime, pplToCheckIn[0].PersonID);
 
                             // Want to ensure that auto-advance only happens if the child has NOT checked in yet.
-                            if (oa == null)
+                            if (oa == null || !oa.Attended)
                             {
                                 ihAttendeeIDs.Value = pplToCheckIn[0].PersonID.ToString();
                                 btnSelectFamilyMemberContinue_Click(Constants.NULL_STRING, EventArgs.Empty);
