@@ -1,6 +1,11 @@
 ﻿/*
-* $Revision: 22 $
-* $Date: 2009-10-14 14:24:14-07:00 $ 
+* $Revision$
+* $Date$ 
+*
+* SVN Keywords
+*   $Author$
+*   $Revision$
+*   $Date$
 */
 html
 {
@@ -453,9 +458,12 @@ td.fail
 	padding-left: 10px;
 }
 
+/* fixed Bug #345 */
 .familyMemberGrid
 {
     margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /***********************************************
