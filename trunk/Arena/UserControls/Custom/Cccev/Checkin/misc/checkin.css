@@ -110,8 +110,9 @@ div.footer
 .footerRight
 {
 	float: right;
-	width: 500px;
+	max-width: 500px;
 	text-align: right;
+	line-height: 118px;
 }
 
 .footerWide
@@ -201,7 +202,7 @@ h3.checkinText
 	overflow: auto;
 }
 
-input.phoneButton
+.phoneButton
 {
 	background-image: url(../images/phone_button.png);
 	background-color: Transparent;
@@ -210,7 +211,9 @@ input.phoneButton
 	color: #FFFFFF;
 	height: 77px;
 	width: 95px;
-	padding: 5px;
+	cursor: default;
+	text-align: center;
+	line-height: 77px;
 }
 
 .scrollArea
@@ -262,7 +265,7 @@ input.phoneButton
 	scrollbar-darkshadow-color: #000000;
 }
 
-input.dataButton
+.dataButton
 {
 	color: #FFFFFF;
 	font-size: 28pt;
@@ -272,9 +275,12 @@ input.dataButton
 	border: none;
 	width: 263px;
 	height: 91px;
+	line-height: 91px;
+	text-align: center;
+	cursor: default;
 }
 
-input.dataButtonInactive
+.dataButtonInactive
 {
 	color: #FFFFFF;
 	font-size: 28pt;
@@ -312,7 +318,7 @@ input.nameButton
 	padding-right: 15px;
 }
 
-input.nextButton
+.nextButton
 {
 	color: #000000;
 	font-size: 30pt;
@@ -324,10 +330,12 @@ input.nextButton
 	height: 118px;
 	padding-right: 30px;
 	margin-right: 50px;
-	
+	text-align: center;
+	line-height: 118px;
+	cursor: default;
 }
 
-input.nextButtonInactive
+.nextButtonInactive
 {
 	color: #444444;
 	font-size: 30pt;
@@ -339,9 +347,12 @@ input.nextButtonInactive
 	height: 118px;
 	padding-right: 30px;
 	margin-right: 50px;
+	text-align: center;
+	line-height: 118px;
+	cursor: default;
 }
 
-input.phoneSearch
+.phoneSearch
 {
 	font-size: 28pt;
 	color: #000000;
@@ -353,6 +364,9 @@ input.phoneSearch
 	border: none;
 	padding-right: 30px;
 	padding-bottom: 7px;
+	cursor: default;
+	text-align: center;
+	line-height: 75px;
 }
 
 input.phoneText
@@ -369,7 +383,7 @@ input.phoneText
 	
 }
 
-input.cancelButton
+.cancelButton
 {
 	font-size: 30pt;
 	color: #000000;
@@ -380,9 +394,12 @@ input.cancelButton
 	border: none;
 	height: 118px;
 	width: 177px;
+	cursor: default;
+	text-align: center;
+	line-height: 118px;
 }
 
-input.searchButton
+.searchButton
 {
 	color: #000000;
 	font-size: 32pt;
@@ -392,8 +409,10 @@ input.searchButton
 	border: none;
 	width: 420px;
 	height: 118px;
-	padding-top: 20px;
-	
+	padding-top: 7px;
+	cursor: default;
+	text-align: center;
+	line-height: 118px;
 }
 
 .dataStar
