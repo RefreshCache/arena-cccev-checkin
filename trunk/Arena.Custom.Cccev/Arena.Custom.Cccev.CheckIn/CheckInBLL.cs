@@ -4,10 +4,20 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
-* $Revision: 59 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   59   2010-01-20 15:42:48-07:00   JasonO $
+* $Revision: 62 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   62   2010-11-01 17:37:41-07:00   nicka $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
+*  
+*  Revision: 62   Date: 2010-11-02 00:37:41Z   User: nicka 
+*  Update for issues #343 #344 #349. 
+*  
+*  Revision: 61   Date: 2010-10-14 18:47:50Z   User: JasonO 
+*  Adding minor changes to avoid issues with running code outside asp.net. 
+*  Updating to 2010.1. 
+*  
+*  Revision: 60   Date: 2010-09-23 20:53:58Z   User: JasonO 
+*  Implementing changes suggested by HDC. 
 *  
 *  Revision: 59   Date: 2010-01-20 22:42:48Z   User: JasonO 
 *  Adding support for declaring print-provider at the module level. 
@@ -100,6 +110,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using Arena.CheckIn;
@@ -165,32 +176,51 @@ namespace Arena.Custom.Cccev.CheckIn
 
     public class CheckInController
     {
+
+		
         /// <summary>
         /// Determines whether or not a family member is allowed to check in based on age and grade passed in.
+		/// The grade check takes precedence over age check. 
         /// </summary>
         /// <param name="fm"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to check in</param>
         /// <param name="maxAge">Maximum age</param>
         /// <param name="maxGrade">Maximum grade level</param>
         /// <returns>bool indicating whether or not Family Member can check in to Occurrence Attendance</returns>
         public static bool CanCheckIn(FamilyMember fm, int maxAge, int maxGrade)
+		{
+			return CanCheckIn( fm, Constants.NULL_INT, maxAge, Constants.NULL_INT, maxGrade );
+		}
+
+        /// <summary>
+        /// Determines whether or not a family member is allowed to check in based on age and grade passed in.
+		/// The grade check takes precedence over age check.
+        /// </summary>
+        /// <param name="fm"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to check in</param>
+		/// <param name="minAge">Minmum age</param>
+		/// <param name="maxAge">Maximum age</param>
+		/// <param name="minGrade">Minmum grade level</param>
+		/// <param name="maxGrade">Maximum grade level</param>
+        /// <returns>bool indicating whether or not Family Member can check in to Occurrence Attendance</returns>
+        public static bool CanCheckIn(FamilyMember fm, int minAge, int maxAge, int minGrade, int maxGrade)
         {
             int gradeLevel = Person.CalculateGradeLevel(fm.GraduationDate, ArenaContext.Current.Organization.GradePromotionDate);
 
 			if (gradeLevel != Constants.NULL_INT && !HasGraduated(fm))
             {
-                return gradeLevel <= maxGrade;
+                return  minGrade <= gradeLevel && gradeLevel <= maxGrade;	// #344
             }
 
             if (fm.Age != Constants.NULL_INT)
             {
                 if (maxAge != Constants.NULL_INT)
                 {
-                    return fm.Age <= maxAge;
+                    return minAge <= fm.Age && fm.Age <= maxAge;			// #344
                 }
 
                 return true;
             }
 
+			// No grade, no age, no checkin.
             return false;
         }
 
@@ -330,16 +360,31 @@ namespace Arena.Custom.Cccev.CheckIn
             string hostValue;
             ComputerSystem computer;
 
+            // Basically here we want to lookup the system's "name" (as seen in the DNS)
+            // using the given IP address.  We do this because some people are using
+            // DHCP which means the kiosk may have a different IP from time to time,
+            // however it was originally registered in Arena with a particular IP
+            // -- so if we simply tried to find the Arena "computer" using the IP
+            // we may not find it.
+
+            // Try with all our might to find the name based on the IP...
             try
             {
                 hostValue = System.Net.Dns.GetHostEntry(ip).HostName;
             }
-            catch (System.Net.Sockets.SocketException)
+            catch (SocketException)
             {
-                /// NOTE: GetHostEntry() doesn't always work perfectly. See comments
-                /// in "Community Content" section of the link below:
-                /// http://msdn.microsoft.com/en-us/library/ms143998.aspx
-                hostValue = System.Net.Dns.GetHostByAddress(ip).HostName;
+                try
+                {
+                    // NOTE: GetHostEntry() doesn't always work perfectly. See comments
+                    // in "Community Content" section of the link below:
+                    // http://msdn.microsoft.com/en-us/library/ms143998.aspx
+                    hostValue = System.Net.Dns.GetHostByAddress(ip).HostName;
+                }
+                catch (SocketException)
+                {
+                    hostValue = ip;
+                }
             }
 
             if (Regex.IsMatch(hostValue, @"\d+\.\d+\.\d+\.\d+"))
@@ -400,7 +445,8 @@ namespace Arena.Custom.Cccev.CheckIn
             if (personAttribute != null)
             {
                 personAttribute.IntValue = maxAbilityLevelLookupValue;
-                personAttribute.Save(ArenaContext.Current.Organization.OrganizationID, ArenaContext.Current.User.Identity.Name);
+                // Passing string literal here to avoid complications outside of an asp.net environment
+                personAttribute.Save(ArenaContext.Current.Organization.OrganizationID, "Cccev.CheckIn");
             }
         }
 
@@ -440,8 +486,8 @@ namespace Arena.Custom.Cccev.CheckIn
                                                  !loc.RoomClosed && !o.OccurrenceClosed)
                                           select o).ToList();
 
-            /// loop through each class occurrence and constrain choices by
-            /// age/grade, special needs, ability level, etc
+            // loop through each class occurrence and constrain choices by
+            // age/grade, special needs, ability level, etc
             for (int i = 0; i < openClassesByStartTime.Count; i++)
             {
                 Occurrence occurrence = openClassesByStartTime[i];
@@ -638,7 +684,9 @@ namespace Arena.Custom.Cccev.CheckIn
                 FamilyId = familyID,
                 SystemId = kiosk.SystemId
             };
-            session.Save(ArenaContext.Current.User.Identity.Name);
+
+            // Passing string literal here to avoid complications outside of an asp.net environment
+            session.Save("Cccev.CheckIn");
 
             foreach (KeyValuePair<FamilyMember, List<Occurrence>> person in familyMap)
             {
@@ -686,11 +734,12 @@ namespace Arena.Custom.Cccev.CheckIn
                                                               };
                         ISecurityCode securityCode =
                             SecurityCodeHelper.GetSecurityCodeClass(SecurityCodeHelper.DefaultSecurityCodeSystem(ArenaContext.Current.Organization.OrganizationID));
-                        attendance.SecurityCode = securityCode.GetSecurityCode();
+                        attendance.SecurityCode = securityCode.GetSecurityCode(attendee);
                         attendance.Attended = true;
                         attendance.CheckInTime = DateTime.Now;
                         attendance.SessionID = sessionID;
-                        attendance.Save(ArenaContext.Current.User.Identity.Name);
+                        // Passing string literal here to avoid complications outside of an asp.net environment
+                        attendance.Save("Cccev.CheckIn");
 
                         if (firstAttendance == null)
                         {
@@ -707,8 +756,9 @@ namespace Arena.Custom.Cccev.CheckIn
                     try
                     {
                         // If SQL exception is generated, we want to log it w/o taking the user out of the checkin app
+                        // Passing string literal here to avoid complications outside of an asp.net environment
                         new ExceptionHistoryData().AddUpdate_Exception(ex, ArenaContext.Current.Organization.OrganizationID,
-                                ArenaContext.Current.User.Identity.Name, ArenaContext.Current.ServerUrl);
+                                "Cccev.CheckIn", ArenaContext.Current.ServerUrl);
                     }
                     catch (SqlException) { }
                 }
@@ -738,7 +788,8 @@ namespace Arena.Custom.Cccev.CheckIn
                         if (occurrence.IsMaximumReached(location.GetHeadCountByDate(occurrence.StartTime), 0))
                         {
                             occurrence.OccurrenceClosed = true;
-                            occurrence.Save(ArenaContext.Current.User.Identity.Name, false);
+                            // Passing string literal here to avoid complications outside of an asp.net environment
+                            occurrence.Save("Cccev.CheckIn", false);
                         }
                     }
                 }
@@ -797,12 +848,14 @@ namespace Arena.Custom.Cccev.CheckIn
             catch (Exception ex)
             {
                 attendance.Notes = "Print Failure";
-                attendance.Save(ArenaContext.Current.User.Identity.Name);
+                // Passing string literal here to avoid complications outside of an asp.net environment
+                attendance.Save("Cccev.CheckIn");
 
                 try
                 {
+                    // Passing string literal here to avoid complications outside of an asp.net environment
                     new ExceptionHistoryData().AddUpdate_Exception(ex, ArenaContext.Current.Organization.OrganizationID,
-                                ArenaContext.Current.User.Identity.Name, ArenaContext.Current.ServerUrl);
+                                "Cccev.CheckIn", ArenaContext.Current.ServerUrl);
                 }
                 catch (SqlException) { }
 
