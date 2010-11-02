@@ -308,7 +308,7 @@
         txtPhone = document.getElementById('<%= txtPhone.ClientID %>');
         button = document.getElementById('<%= btnFamilySearch.ClientID %>');
         label = document.getElementById('<%= lblMessage.ClientID %>');
-        maxDigits = parseInt('<%= PhoneLengthSetting %>');
+        maxDigits = parseInt('<%= PhoneLengthMaxSetting %>');
 
         getState();
 
@@ -664,9 +664,9 @@
                         <p class="checkinText">Select All People Attending Today</p>
                     </div>
                     <div class="resultScrollArea">
-	                    <asp:DataList id="dgFamilyMembers" runat="server" DataKeyField="PersonID" CssClass="familyMemberGrid"
+                        <!-- #349 --><asp:DataList id="dgFamilyMembers" runat="server" DataKeyField="PersonID" CssClass="familyMemberGrid"
 		                    CellSpacing="5" RepeatColumns="1" BorderColor="Black" BorderWidth="0" Width="353"
-		                    OnItemDataBound="dgFamilyMembers_ItemDataBound" ItemStyle-HorizontalAlign="Left" GridLines="Both">
+		                    OnItemDataBound="dgFamilyMembers_ItemDataBound" ItemStyle-HorizontalAlign="Left" GridLines="None">
                             <ItemStyle HorizontalAlign="Left"></ItemStyle>
 		                    <ItemTemplate>
 		                        <div style="width: 338px;">

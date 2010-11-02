@@ -4,18 +4,24 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInWizard.ascx.cs $
-* $Revision: 55 $ 
-* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   55   2010-06-28 10:28:51-07:00   JasonO $
+* $Revision: 57 $ 
+* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   57   2010-11-01 17:37:43-07:00   nicka $
 * 
 * $Log: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs $
 *  
-*  Revision: 55   Date: 2010-06-28 17:28:51Z   User: JasonO 
+*  Revision: 57   Date: 2010-11-02 00:37:43Z   User: nicka 
+*  Update for issues #343 #344 #349. 
+*  
+*  Revision: 56   Date: 2010-09-23 20:54:02Z   User: JasonO 
+*  Implementing changes suggested by HDC. 
+*  
+*  Revision: 55   Date: 2010-06-28 17:28:51Z   User: JasonO
 *  Bug Fix: If an occurrence attendance somehow existst (via multiple 
 *  checkins?) we'll now check whether the "Attended" bit is set to false 
 *  before allowing the family member to continue. 
 *  
 *  Revision: 54   Date: 2010-01-20 22:43:25Z   User: JasonO 
-*  Adding support for declaring print-provider at the module level. 
+*  Adding support for declaring print-provider at the module level.
 *  
 *  Revision: 53   Date: 2010-01-19 23:18:04Z   User: JasonO 
 *  
@@ -101,7 +107,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
         public string CssPathSetting { get { return Setting("CssPath", "UserControls/Custom/Cccev/Checkin/Misc/checkin.css", false); } }
 
         [TextSetting("Background Image Relative Path", "Relative path to background image for Init State.", false)]
-        public string BackgroundImagePathSetting { get { return Setting("BackgroundImagePath", "/Arena/UserControls/Custom/Cccev/Checkin/images/default_checkin_splash.png", false); } }
+        public string BackgroundImagePathSetting { get { return Setting("BackgroundImagePath", "UserControls/Custom/Cccev/Checkin/images/default_checkin_splash.png", false); } }
 
         [NumericSetting("Auto Refresh Time (Long)", "Time in seconds for page to refresh if left inactive. Defaults to 120 seconds.", false)]
         public string LongRefreshTimeSetting { get { return Setting("LongRefreshTime", "120", false); } }
@@ -135,11 +141,23 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
         [BooleanSetting("Allow Scan By Phone", "Controls whether or not a person can search by phone.  Defaults to true.", true, true)]
         public string AllowScanByPhoneSetting { get { return Setting("AllowScanByPhone", "true", false); } }
 
-        [NumericSetting("Minimum Phone Number Length", "Minimum length for phone number searches in characters (defaults to 10).", false)]
+        [NumericSetting("Minimum Phone Number Length", "Minimum length for phone number searches (defaults to 10).", false)]
         public string PhoneLengthSetting { get { return Setting("PhoneLength", "10", false); } }
+        
+        // #343
+        [NumericSetting("Maximum Phone Number Length", "Maximum length for phone number searches (defaults to 10).", false)]
+        public string PhoneLengthMaxSetting { get { return Setting("PhoneLengthMax", "10", false); } }
 
-        [NumericSetting("Maximum Age", "Maximum age of child who can check in.  Leave blank for none.", false)]
+        // #344
+        [NumericSetting( "Minimum Age", "Minimum age of child who can check in. Note: Grade check supersedes the age check.  Leave blank for none.", false )]
+        public string MinimumAgeSetting { get { return Setting( "MinimumAge", "-1", false ); } }
+
+        [NumericSetting( "Maximum Age", "Maximum age of child who can check in.  Note: Grade check supersedes the age check.  Leave blank for none.", false )]
         public string MaximumAgeSetting { get { return Setting("MaximumAge", "-1", false); } }
+
+        // #344
+        [NumericSetting( "Minimum Grade", "Minimum grade of child who can check in. Leave blank for none.", false )]
+        public string MinimumGradeSetting { get { return Setting( "MinimumGrade", "-1", false ); } }
 
         [NumericSetting("Maximum Grade", "Maximum grade of child who can check in. Default is 6.", false)]
         public string MaximumGradeSetting { get { return Setting("MaximumGrade", "6", false); } }
@@ -680,9 +698,9 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             {
                 try
                 {
-                    // Filter out any relatives who are too old.
+                    // Filter out any relatives who are too young (#344) or too old or by grade
                     List<FamilyMember> pplToCheckIn = (from FamilyMember fm in familyMembers
-                                       where CheckInController.CanCheckIn(fm, int.Parse(MaximumAgeSetting), int.Parse(MaximumGradeSetting))
+                                       where CheckInController.CanCheckIn(fm, int.Parse(MinimumAgeSetting), int.Parse(MaximumAgeSetting), int.Parse(MinimumGradeSetting), int.Parse(MaximumGradeSetting) )
                                        select fm).ToList();
 
                     if (pplToCheckIn.Count > 0)
@@ -696,7 +714,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
                             OccurrenceAttendance oa = CheckInController.GetAttendance(occurrences.First().StartTime, pplToCheckIn[0].PersonID);
 
                             // Want to ensure that auto-advance only happens if the child has NOT checked in yet.
-                            if (oa == null || !oa.Attended)
+                            if ( oa == null || !oa.Attended )
                             {
                                 ihAttendeeIDs.Value = pplToCheckIn[0].PersonID.ToString();
                                 btnSelectFamilyMemberContinue_Click(Constants.NULL_STRING, EventArgs.Empty);
