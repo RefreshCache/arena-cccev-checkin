@@ -4,10 +4,13 @@
 * Date Created: 9/15/2009
 *
 * $Workfile: RSPrintLabel.cs $
-* $Revision: 2 $
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/RSPrintLabel.cs   2   2009-10-08 17:07:46-07:00   JasonO $
+* $Revision: 3 $
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/RSPrintLabel.cs   3   2010-09-23 13:53:58-07:00   JasonO $
 *
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/RSPrintLabel.cs $
+*  
+*  Revision: 3   Date: 2010-09-23 20:53:58Z   User: JasonO 
+*  Implementing changes suggested by HDC. 
 *  
 *  Revision: 2   Date: 2009-10-09 00:07:46Z   User: JasonO 
 *  
@@ -16,47 +19,20 @@
 **********************************************************************/
 
 using System.Collections.Generic;
-using System.Linq;
+using Arena.CheckIn;
 using Arena.Computer;
 using Arena.Core;
-using Arena.Organization;
 using Arena.Reporting;
-using ReportParameter = Arena.Reporting.ReportParameter;
 
 namespace Arena.Custom.Cccev.CheckIn.Entity
 {
     internal class RSPrintLabel : IPrintLabel
     {
-        public void Print(FamilyMember person, IEnumerable<Occurrence> occurrences, OccurrenceAttendance attendance, ComputerSystem kiosk)
+        public void Print(FamilyMember person, IEnumerable<Occurrence> occurrences, OccurrenceAttendance attendance, ComputerSystem system)
         {
-            List<ReportParameter> parameters = new List<ReportParameter>
-                                                   {
-                                                       new ReportParameter("OccurrenceAttendanceID", attendance.OccurrenceAttendanceID.ToString())
-                                                   };
-
-            OccurrenceTypeReportCollection reports = new OccurrenceTypeReportCollection(occurrences.First().OccurrenceTypeID);
-            ReportPrintJobCollection jobs = new ReportPrintJobCollection();
-
-            foreach (OccurrenceTypeReport report in reports)
-            {
-                bool printLocally = true;
-                string printerName;
-
-                if (report.UseDefaultPrinter)
-                {
-                    printerName = kiosk.Printer.PrinterName;
-                }
-                else
-                {
-                    printerName = new Location(occurrences.First().LocationID).Printer.PrinterName;
-                    printLocally = false;
-                }
-
-                ReportPrintJob printJob = new ReportPrintJob(printerName, report.ReportPath, 1, true, parameters, 
-                    printLocally, string.Format("Cccev.CheckIn_Attendance-{0}", attendance.OccurrenceAttendanceID));
-                jobs.Add(printJob);
-            }
-
+            // Don't new up Kiosk w/o empty constructor, might be too costly
+            Kiosk kiosk = new Kiosk() { System = system };
+            var jobs = kiosk.GetPrintJobs(attendance);
             ReportPrinter printer = new ReportPrinter();
             printer.PrintReports(jobs);
         }
