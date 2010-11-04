@@ -4,10 +4,13 @@
 * Date Created:	TBD
 *
 * $Workfile: ISecurityCode.cs $
-* $Revision: 4 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/ISecurityCode.cs   4   2009-02-24 11:18:51-07:00   JasonO $
+* $Revision: 5 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/ISecurityCode.cs   5   2010-09-23 13:53:58-07:00   JasonO $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/ISecurityCode.cs $
+*  
+*  Revision: 5   Date: 2010-09-23 20:53:58Z   User: JasonO 
+*  Implementing changes suggested by HDC. 
 *  
 *  Revision: 4   Date: 2009-02-24 18:18:51Z   User: JasonO 
 *  Updating org setting keys for provider class Luids. 
@@ -17,11 +20,8 @@
 
 using System;
 using System.Reflection;
-using System.Text;
-
 using Arena.Core;
 using Arena.Exceptions;
-using Arena.Organization;
 
 namespace Arena.Custom.Cccev.CheckIn.Entity
 {
@@ -31,14 +31,14 @@ namespace Arena.Custom.Cccev.CheckIn.Entity
         /// Returns security code.
         /// </summary>
         /// <returns><see cref="string"/>Security Code</returns>
-        string GetSecurityCode();
+        string GetSecurityCode(Person p);
     }
 
     public static class SecurityCodeHelper
     {
         public static Lookup DefaultSecurityCodeSystem(int organizationID)
         {
-            Arena.Organization.Organization org = new Arena.Organization.Organization(organizationID);
+            Organization.Organization org = new Organization.Organization(organizationID);
             Lookup lookup = null;
 
             if (org.Settings["Cccev.SecurityCodeDefaultSystemID"] != null)
@@ -60,12 +60,8 @@ namespace Arena.Custom.Cccev.CheckIn.Entity
             if (assembly == null)
                 return null;
 
-            Type type = assembly.GetType(securityCodeSystem.Qualifier8);
-
-            if (type == null)
-            {
-                type = assembly.GetType(securityCodeSystem.Qualifier2 + "." + securityCodeSystem.Qualifier8);
-            }
+            Type type = assembly.GetType(securityCodeSystem.Qualifier8) ??
+                        assembly.GetType(securityCodeSystem.Qualifier2 + "." + securityCodeSystem.Qualifier8);
 
             if (type == null)
             {
