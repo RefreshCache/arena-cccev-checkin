@@ -4,10 +4,18 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
-* $Revision: 62 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   62   2010-11-01 17:37:41-07:00   nicka $
+* $Revision: 64 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   64   2010-11-03 15:22:06-07:00   JasonO $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
+*  
+*  Revision: 64   Date: 2010-11-03 22:22:06Z   User: JasonO 
+*  Refactoring to bring more data regarding results of check in process out to 
+*  UI level. 
+*  
+*  Revision: 63   Date: 2010-11-02 15:48:46Z   User: JasonO 
+*  Possible fix to Redmine issue 346 (http://bit.ly/bGPyy7) regarding 
+*  MembershipRequired on the Occurrence. 
 *  
 *  Revision: 62   Date: 2010-11-02 00:37:41Z   User: nicka 
 *  Update for issues #343 #344 #349. 
@@ -548,11 +556,11 @@ namespace Arena.Custom.Cccev.CheckIn
                         }
                     }
                 }
-                else
-                {
-                    GetClassByLoad(occurrence.StartTime, occurrenceTypeAttribute, occurrence, openClassesByStartTime, matchingClasses);
-                    log.Append(" - FOUND MATCH!\n");
-                }
+				else
+				{
+					GetClassByLoad(occurrence.StartTime, occurrenceTypeAttribute, occurrence, openClassesByStartTime, matchingClasses);
+					log.Append(" - FOUND MATCH!\n");
+				}
             }
 
             LogResults(log.ToString());
@@ -662,23 +670,22 @@ namespace Arena.Custom.Cccev.CheckIn
         }
 
         /// <summary>
-        /// Iterates through Dictionary of family members, checks them in, and returns a Generic List of status strings.
+        /// Iterates through requests and checks them in.
         /// </summary>
         /// <param name="printProviderID">Lookup ID of selected print provider</param>
         /// <param name="familyID">ID of the current <see cref="Arena.Core.Family">Family</see> loaded from search</param>
-        /// <param name="familyMap">Generic Dictionary of FamilyMembers (key) and OccurrenceCollections (value)</param>
+		/// <param name="requests">List of of <see cref="Arena.Custom.Cccev.CheckIn.PersonCheckInRequest">PersonCheckInRequest</see></param>
 		/// <param name="kiosk"><see cref="Arena.Computer.ComputerSystem">ComputerSystem</see> the family is standing at</param>
-        /// <returns>Generic List of status messages</returns>
-        public static List<string> CheckInFamily(int printProviderID, int familyID, Dictionary<FamilyMember, List<Occurrence>> familyMap, ComputerSystem kiosk)
+		/// <returns>List of <see cref="Arena.Custom.Cccev.CheckIn.PersonCheckInResult">PersonCheckInResult</see></returns>
+        public static List<PersonCheckInResult> CheckInFamily(int printProviderID, int familyID, IList<PersonCheckInRequest> requests, ComputerSystem kiosk)
         {
             IPrintLabel pl = PrintLabelHelper.GetPrintLabelClass(printProviderID);
-            return CheckInFamily(pl, familyID, familyMap, kiosk);
+            return CheckInFamily(pl, familyID, requests, kiosk);
         }
 
-        public static List<string> CheckInFamily(IPrintLabel printLabel, int familyID, Dictionary<FamilyMember, 
-            List<Occurrence>> familyMap, ComputerSystem kiosk)
+        public static List<PersonCheckInResult> CheckInFamily(IPrintLabel printLabel, int familyID, IList<PersonCheckInRequest> requests, ComputerSystem kiosk)
         {
-            List<string> results = new List<string>();
+            List<PersonCheckInResult> results = new List<PersonCheckInResult>();
             Session session = new Session
             {
                 FamilyId = familyID,
@@ -688,12 +695,12 @@ namespace Arena.Custom.Cccev.CheckIn
             // Passing string literal here to avoid complications outside of an asp.net environment
             session.Save("Cccev.CheckIn");
 
-            foreach (KeyValuePair<FamilyMember, List<Occurrence>> person in familyMap)
+            foreach (var request in requests)
             {
-                results.Add(CheckInFamilyMember(printLabel, person.Key, person.Value, session.SessionId, kiosk));
+                results.Add(CheckInFamilyMember(printLabel, request.FamilyMember, request.Occurrences, session.SessionId, kiosk));
             }
 
-            CheckOccurrenceAttendance(familyMap);
+            CheckOccurrenceAttendance(results);
             return results;
         }
 
@@ -705,25 +712,37 @@ namespace Arena.Custom.Cccev.CheckIn
         /// <param name="occurrences"><see cref="Arena.Core.OccurrenceCollection">OccurrenceCollection</see> of Occurrences attendee can check into</param>
         /// <param name="sessionID">ID of the current CheckIn <see cref="Arena.CheckIn.Session">Session</see></param>
 		/// <param name="kiosk"><see cref="Arena.Computer.ComputerSystem">ComputerSystem</see> the family is standing at</param>
-        /// <returns>Status variable to be displayed on the view</returns>
-        private static string CheckInFamilyMember(IPrintLabel printLabel, FamilyMember attendee, IEnumerable<Occurrence> occurrences, 
+		/// <returns><see cref="Arena.Custom.Cccev.CheckIn.PersonCheckInResult">PersonCheckInResult</see></returns>
+        private static PersonCheckInResult CheckInFamilyMember(IPrintLabel printLabel, FamilyMember attendee, IEnumerable<Occurrence> occurrences, 
             int sessionID, ComputerSystem kiosk)
         {
-            bool success = true;
-            string output = Constants.NULL_STRING;
-            OccurrenceAttendance firstAttendance = null;
+            bool wasCheckedInSuccessfullyToAllClasses = true;
+			OccurrenceAttendance firstAttendance = null;
+        	var result = new PersonCheckInResult
+        	             	 {
+        	             		 FamilyMember = attendee,
+        	             		 CheckInResults = new List<CheckInResult>(),
+        	             		 SessionID = sessionID,
+        	             		 IsPrintSuccessful = false
+        	             	 };
 
             foreach (Occurrence occurrence in occurrences)
             {
+            	var checkInResult = new CheckInResult
+            	                    	{
+            	                    		IsCheckInSuccessful = false,
+											Occurrence = occurrence
+            	                    	};
+
+				result.CheckInResults.Add(checkInResult);
+
                 try
                 {
                     if ((occurrence is EmptyOccurrence ||
                         occurrence.OccurrenceID == Constants.NULL_INT) &&
                         DateTime.Now > occurrence.CheckInEnd)
                     {
-                        success = false;
-                        output = string.Format("\t<tr><td class=\"resultTable\">{0}</td><td colspan=\"2\" class=\"resultTable fail\"><span class=\"fail\">{1}</span></td></tr>\n",
-                            attendee.NickName, occurrence.Location);
+                        wasCheckedInSuccessfullyToAllClasses = false;
                     }
                     else
                     {
@@ -741,6 +760,9 @@ namespace Arena.Custom.Cccev.CheckIn
                         // Passing string literal here to avoid complications outside of an asp.net environment
                         attendance.Save("Cccev.CheckIn");
 
+                    	result.Attendance = attendance;
+                    	checkInResult.IsCheckInSuccessful = true;
+
                         if (firstAttendance == null)
                         {
                             firstAttendance = attendance;
@@ -749,9 +771,7 @@ namespace Arena.Custom.Cccev.CheckIn
                 }
                 catch (SqlException ex)
                 {
-                    success = false;
-                    output = string.Format("\t<tr><td class=\"resultTable\">{0}</td><td class=\"resultTable fail\">{1}</td><td class=\"resultTable fail\"><span class=\"fail\">{2}</span></td></tr>\n",
-                    attendee.NickName, occurrences.First().Location, "Check-In Failure");
+					wasCheckedInSuccessfullyToAllClasses = false;
 
                     try
                     {
@@ -764,37 +784,46 @@ namespace Arena.Custom.Cccev.CheckIn
                 }
             }
 
-            if (success)
+            if (wasCheckedInSuccessfullyToAllClasses)
             {
-                output = PrintLabel(printLabel, attendee, occurrences, firstAttendance, kiosk);
+                result.IsPrintSuccessful = PrintLabel(printLabel, attendee, occurrences, firstAttendance, kiosk);
             }
 
-            return output;
+            return result;
         }
 
-        private static void CheckOccurrenceAttendance(Dictionary<FamilyMember, List<Occurrence>> familyMap)
-        {
-            List<Occurrence> processedOccurrences = new List<Occurrence>();
+		/// <summary>
+		/// Closes an Occurrence where the Occurrence and its Location's maximum attendance has been reached.
+		/// </summary>
+		/// <param name="personCheckInResults">List of <see cref="Arena.Custom.Cccev.CheckIn.PersonCheckInResult">PersonCheckInResult</see></param>
+		private static void CheckOccurrenceAttendance(IEnumerable<PersonCheckInResult> personCheckInResults)
+		{
+			var processedOccurrenceIDs = new List<int>();
 
-            foreach (KeyValuePair<FamilyMember, List<Occurrence>> map in familyMap)
-            {
-                foreach (Occurrence occurrence in map.Value)
-                {
-                    if (!processedOccurrences.Contains(occurrence))
-                    {
-                        processedOccurrences.Add(occurrence);
-                        Location location = new Location(occurrence.OccurrenceID);
+			// Unique list of Occurrences that were successfully checked into.
+			var occurrences = from resultGroup in personCheckInResults
+			                  let checkInResults = resultGroup.CheckInResults
+								  from theResult in checkInResults
+								  where theResult.IsCheckInSuccessful
+								  select theResult.Occurrence;
 
-                        if (occurrence.IsMaximumReached(location.GetHeadCountByDate(occurrence.StartTime), 0))
-                        {
-                            occurrence.OccurrenceClosed = true;
-                            // Passing string literal here to avoid complications outside of an asp.net environment
-                            occurrence.Save("Cccev.CheckIn", false);
-                        }
-                    }
-                }
-            }
-        }
+			foreach (var o in occurrences)
+			{
+				if (processedOccurrenceIDs.Contains(o.OccurrenceID))
+				{
+					continue;
+				}
+
+				processedOccurrenceIDs.Add(o.OccurrenceID);
+				var location = new Location(o.LocationID);
+
+				if (o.IsMaximumReached(location.GetHeadCountByDate(o.StartTime), 0))
+				{
+					o.OccurrenceClosed = true;
+					o.Save("Cccev.CheckIn", false);
+				}
+			}
+		}
 
         /// <summary>
         /// Public facade to allow for manually printing labels.  Calls private PrintLabel() method.
@@ -808,24 +837,13 @@ namespace Arena.Custom.Cccev.CheckIn
         public static bool Print(int printProviderID, FamilyMember attendee, IEnumerable<Occurrence> occurrences, OccurrenceAttendance attendance, ComputerSystem kiosk)
         {
             IPrintLabel pl = PrintLabelHelper.GetPrintLabelClass(printProviderID);
-
-            if (PrintLabel(pl, attendee, occurrences, attendance, kiosk).Contains("Print Failure"))
-            {
-                return false;
-            }
-
-            return true;
+        	return PrintLabel(pl, attendee, occurrences, attendance, kiosk);
         }
 
         
         public static bool Print(IPrintLabel printLabel, FamilyMember attendee, IEnumerable<Occurrence> occurrences, OccurrenceAttendance attendance, ComputerSystem kiosk)
         {
-            if (PrintLabel(printLabel, attendee, occurrences, attendance, kiosk).Contains("Print Failure"))
-            {
-                return false;
-            }
-
-            return true;
+			return PrintLabel(printLabel, attendee, occurrences, attendance, kiosk);
         }
 
         /// <summary>
@@ -836,33 +854,30 @@ namespace Arena.Custom.Cccev.CheckIn
         /// <param name="occurrences"><see cref="Arena.Core.OccurrenceCollection">OccurrenceCollection</see> of Occurrences the attendee can check into</param>
         /// <param name="attendance"><see cref="Arena.Core.OccurrenceAttendance">OccurrenceAttendance</see> to be updated with failure status if print job fails</param>
 		/// <param name="kiosk"><see cref="Arena.Computer.ComputerSystem">ComputerSystem</see> the family is standing at</param>
-        /// <returns>Status variable to be displayed on the view</returns>
-        private static string PrintLabel(IPrintLabel printLabel, FamilyMember attendee, IEnumerable<Occurrence> occurrences, OccurrenceAttendance attendance, ComputerSystem kiosk)
-        {
+        /// <returns>true if print succeeded</returns>
+		private static bool PrintLabel(IPrintLabel printLabel, FamilyMember attendee, IEnumerable<Occurrence> occurrences, OccurrenceAttendance attendance, ComputerSystem kiosk)
+		{
 			try
-            {
-                printLabel.Print(attendee, occurrences, attendance, kiosk);
-                return string.Format("\t<tr><td class=\"resultTable\">{0}</td><td class=\"resultTable\"><span class=\"classroomText\">{1}</span></td><td class=\"resultTable success\">&nbsp;</td></tr>\n",
-                    attendee.NickName, occurrences.First().Location);
-            }
-            catch (Exception ex)
-            {
-                attendance.Notes = "Print Failure";
-                // Passing string literal here to avoid complications outside of an asp.net environment
-                attendance.Save("Cccev.CheckIn");
+			{
+				printLabel.Print(attendee, occurrences, attendance, kiosk);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				attendance.Notes = "Print Failure";
+				attendance.Save("Cccev.CheckIn");
 
-                try
-                {
-                    // Passing string literal here to avoid complications outside of an asp.net environment
-                    new ExceptionHistoryData().AddUpdate_Exception(ex, ArenaContext.Current.Organization.OrganizationID,
-                                "Cccev.CheckIn", ArenaContext.Current.ServerUrl);
-                }
-                catch (SqlException) { }
+				try
+				{
+					// Passing string literal here to avoid complications outside of an asp.net environment
+					new ExceptionHistoryData().AddUpdate_Exception(ex, ArenaContext.Current.Organization.OrganizationID,
+								"Cccev.CheckIn", ArenaContext.Current.ServerUrl);
+				}
+				catch (SqlException) { }
 
-                return string.Format("\t<tr><td class=\"resultTable\">{0}</td><td class=\"resultTable\">{1}</td><td class=\"resultTable fail\"><span class=\"fail\">{2}</span></td></tr>\n",
-                    attendee.NickName, occurrences.First().Location, attendance.Notes);
-            }
-        }
+				return false;
+			}
+		}
 
         private static Occurrence GetEmptyOccurrence(DateTime startTime)
         {
