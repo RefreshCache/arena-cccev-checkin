@@ -4,10 +4,27 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInWizard.ascx.cs $
-* $Revision: 57 $ 
-* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   57   2010-11-01 17:37:43-07:00   nicka $
+* $Revision: 62 $ 
+* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   62   2010-11-04 13:04:37-07:00   JasonO $
 * 
 * $Log: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs $
+*  
+*  Revision: 62   Date: 2010-11-04 20:04:37Z   User: JasonO 
+*  More cleanup. 
+*  
+*  Revision: 61   Date: 2010-11-04 20:03:41Z   User: JasonO 
+*  Cleaning up BuildResultString method. 
+*  
+*  Revision: 60   Date: 2010-11-04 20:02:54Z   User: JasonO 
+*  Cleaning up BuildResultString code. 
+*  
+*  Revision: 59   Date: 2010-11-03 22:22:07Z   User: JasonO 
+*  Refactoring to bring more data regarding results of check in process out to 
+*  UI level. 
+*  
+*  Revision: 58   Date: 2010-11-02 19:17:42Z   User: JasonO 
+*  Implementing post-checkin page redirect from redmine case 336 
+*  (http://bit.ly/aFgtyl). 
 *  
 *  Revision: 57   Date: 2010-11-02 00:37:43Z   User: nicka 
 *  Update for issues #343 #344 #349. 
@@ -204,6 +221,9 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
         [LookupSetting("Label Print Provider", "Overrides the default print provider for printing name tags.", true, SystemGuids.CHECKIN_PRINT_PROVIDER_LOOKUP_TYPE_STRING)]
         public string PrintProviderSetting { get { return Setting("PrintProvider", "", true); } }
 
+		[PageSetting("Post-Check In Redirect Page", "If set, the system will redirect to this page once the Check In process completes.", false)]
+		public string PostCheckinRedirectPageSetting { get { return Setting("PostCheckinRedirectPage", "", false); } }
+
         #endregion
 
         #region Private Members
@@ -283,6 +303,12 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
                     Session["autoAdvance"] = true;
                     state = CheckInStates.Init;
                     Session[CheckInConstants.SESS_STATE] = state;
+
+					if (!string.IsNullOrEmpty(PostCheckinRedirectPageSetting))
+					{
+						Response.Redirect(string.Format("default.aspx?page={0}&sessionid=-1", PostCheckinRedirectPageSetting));
+					}
+
                     break;
                 case CheckInStates.SelectAbility:
                 case CheckInStates.SelectService:
@@ -1268,37 +1294,31 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             return row;
         }
 
-        private void BuildFamilyMap(FamilyMember person, IEnumerable<Occurrence> classes)
-        {
-            Dictionary<FamilyMember, List<Occurrence>> familyMap;
+		private void BuildFamilyMap(FamilyMember person, IEnumerable<Occurrence> classes)
+		{
+			List<PersonCheckInRequest> requests;
 
-            if (Session[CheckInConstants.SESS_KEY_PEOPLEMAP] != null)
-            {
-                familyMap = (Dictionary<FamilyMember, List<Occurrence>>)Session[CheckInConstants.SESS_KEY_PEOPLEMAP];
-            }
-            else
-            {
-                familyMap = new Dictionary<FamilyMember, List<Occurrence>>();
-            }
+			if (Session[CheckInConstants.SESS_KEY_PEOPLEMAP] != null)
+			{
+				requests = (List<PersonCheckInRequest>)Session[CheckInConstants.SESS_KEY_PEOPLEMAP];
+			}
+			else
+			{
+				requests = new List<PersonCheckInRequest>();
+			}
 
-            // Checking if person is already in the session so we're adding the same person to session more than once.
-            bool personPresent = false;
+			if (!requests.Any(p => p.PersonID == person.PersonID))
+			{
+				requests.Add(new PersonCheckInRequest
+				             	{
+				             		PersonID = person.PersonID,
+									FamilyMember = person,
+									Occurrences = classes.ToList()
+				             	});
 
-            foreach (KeyValuePair<FamilyMember, List<Occurrence>> member in familyMap)
-            {
-                if (member.Key.PersonID == person.PersonID)
-                {
-                    personPresent = true;
-                    break;
-                }
-            }
-
-            if (!personPresent)
-            {
-                familyMap.Add(person, classes.ToList());
-                Session[CheckInConstants.SESS_KEY_PEOPLEMAP] = familyMap;
-            }
-        }
+				Session[CheckInConstants.SESS_KEY_PEOPLEMAP] = requests;
+			}
+		}
 
         protected void btnConfirmContinue_Click(object sender, EventArgs e)
         {
@@ -1306,10 +1326,10 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             int totalClasses = int.Parse(Session["ckin_total_occurrences"].ToString());
 
             // submit registration and display result
-            Dictionary<FamilyMember, List<Occurrence>> familyMap = (Dictionary<FamilyMember, List<Occurrence>>)Session[CheckInConstants.SESS_KEY_PEOPLEMAP];
+            var requests = (List<PersonCheckInRequest>) Session[CheckInConstants.SESS_KEY_PEOPLEMAP];
 			ComputerSystem kiosk = (ComputerSystem)Session[ "cccev_ckin_kiosk" ];
-            List<string> results = CheckInController.CheckInFamily(int.Parse(PrintProviderSetting), 
-                ((Family)Session[CheckInConstants.SESS_FAMILY]).FamilyID, familyMap, kiosk);
+			var results = CheckInController.CheckInFamily(int.Parse(PrintProviderSetting),
+				((Family) Session[CheckInConstants.SESS_FAMILY]).FamilyID, requests, kiosk);
             Session[CheckInConstants.SESS_RESULTS] = results;
             state = unavailableClasses == totalClasses ? CheckInStates.Init : CheckInStates.Result;
             Session[CheckInConstants.SESS_STATE] = state;
@@ -1324,24 +1344,63 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
         private void ShowResult()
         {
             pnlResults.Visible = true;
-            List<string> results = (List<string>)Session[CheckInConstants.SESS_RESULTS];
+            var results = (List<PersonCheckInResult>) Session[CheckInConstants.SESS_RESULTS];
             StringBuilder resultTable = new StringBuilder();
             resultTable.Append("<br /><br /><table cellspacing=\"0\" class=\"resultTable\">\n");
 
-            foreach (string s in results)
+            foreach (var result in results)
             {
-                resultTable.Append(s);
+                resultTable.AppendLine(BuildResultString(result));
             }
 
             resultTable.Append("</table>");
             phResults.Controls.Add(new LiteralControl(resultTable.ToString()));
         }
 
+		private static string BuildResultString(PersonCheckInResult result)
+		{
+			var firstResult = result.CheckInResults.OrderBy(r => r.Occurrence.StartTime).First();
+		    string formatString;
+
+			if (firstResult.Occurrence is EmptyOccurrence)
+			{
+				// No matching occurrences found
+				formatString = "<tr><td class=\"resultTable\">{0}</td><td colspan=\"2\" class=\"resultTable fail\"><span class=\"fail\">{1}</span></td></tr>";
+			}
+			else if (!firstResult.IsCheckInSuccessful)
+			{
+				// Check In Failure
+				formatString = "<tr><td class=\"resultTable\">{0}</td><td class=\"resultTable fail\">{1}</td><td class=\"resultTable fail\"><span class=\"fail\">Check-In Failure</span></td></tr>";
+			}
+			else if (!result.IsPrintSuccessful)
+			{
+				// Print Failure
+				formatString = "<tr><td class=\"resultTable\">{0}</td><td class=\"resultTable\">{1}</td><td class=\"resultTable fail\"><span class=\"fail\">Print Failure</span></td></tr>";
+			}
+			else
+			{
+				// Success
+				formatString = "<tr><td class=\"resultTable\">{0}</td><td class=\"resultTable\"><span class=\"classroomText\">{1}</span></td><td class=\"resultTable success\">&nbsp;</td></tr>";
+			}
+
+            return string.Format(formatString, result.FamilyMember.NickName, firstResult.Occurrence.Location);
+		}
+
         protected void btnResultsContinue_Click(object sender, EventArgs e)
         {
-            state = CheckInStates.Init;
-            Session[CheckInConstants.SESS_STATE] = state;
-            ShowView();
+			state = CheckInStates.Init;
+			Session[CheckInConstants.SESS_STATE] = state;
+
+			if (!string.IsNullOrEmpty(PostCheckinRedirectPageSetting))
+			{
+				var results = (IEnumerable<PersonCheckInResult>) Session[CheckInConstants.SESS_RESULTS];
+				var sessionID = results.First().SessionID;
+				Response.Redirect(string.Format("default.aspx?page={0}&sessionid={1}", PostCheckinRedirectPageSetting, sessionID));
+			}
+			else
+			{
+				ShowView();
+			}
         }
 
         #endregion
