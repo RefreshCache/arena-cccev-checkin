@@ -4,10 +4,13 @@
 * Date Created: 11/23/2009
 *
 * $Workfile: CheckInBLLTest.cs $
-* $Revision: 1 $
-* $Header: /trunk/Arena.Custom.Cccev.Tests/Arena.Custom.Cccev.CheckIn.Tests/CheckInBLLTest.cs   1   2009-12-14 17:26:50-07:00   JasonO $
+* $Revision: 2 $
+* $Header: /trunk/Arena.Custom.Cccev.Tests/Arena.Custom.Cccev.CheckIn.Tests/CheckInBLLTest.cs   2   2010-11-03 15:24:27-07:00   JasonO $
 *
 * $Log: /trunk/Arena.Custom.Cccev.Tests/Arena.Custom.Cccev.CheckIn.Tests/CheckInBLLTest.cs $
+*  
+*  Revision: 2   Date: 2010-11-03 22:24:27Z   User: JasonO 
+*  Updating test logic to reflect new BLL changes. 
 *  
 *  Revision: 1   Date: 2009-12-15 00:26:50Z   User: JasonO 
 *  
@@ -685,19 +688,19 @@ namespace Arena.Custom.Cccev.CheckIn.Tests
                 var person = CheckInTestSetup.SetupPhoneSearch();
                 var kiosk = CheckInTestSetup.SetupKiosk();
                 var occurrence = CheckInTestSetup.SetupOccurrenceSearch(kiosk);
+				PersonCheckInRequest request = new PersonCheckInRequest
+            	                               	{
+													PersonID = person.PersonID,
+													FamilyMember = person,
+													Occurrences = new List<Occurrence> { new EmptyOccurrence(occurrence.StartTime) }
+            	                               	};
 
-                Dictionary<FamilyMember, List<Occurrence>> familyMap = new Dictionary<FamilyMember, List<Occurrence>>
-                                                                           {
-                                                                               {
-                                                                                   person, 
-                                                                                   new List<Occurrence> { new EmptyOccurrence(occurrence.StartTime) }
-                                                                               }
-                                                                           };
-
-                var result = CheckInController.CheckInFamily(new MockPrintLabel(), person.FamilyID, familyMap, kiosk);
+            	var familyMap = new List<PersonCheckInRequest> { request };
+                var results = CheckInController.CheckInFamily(new MockPrintLabel(), person.FamilyID, familyMap, kiosk);
                 var location = new Location(occurrence.LocationID);
+            	var result = results.First();
 
-                Assert.True(result.First().Contains("fail"));
+                Assert.False(result.CheckInResults.Any(r => r.IsCheckInSuccessful));
                 Assert.AreEqual(location.CurrentCount, 0);
             }
         }
@@ -710,19 +713,19 @@ namespace Arena.Custom.Cccev.CheckIn.Tests
                 var person = CheckInTestSetup.SetupPhoneSearch();
                 var kiosk = CheckInTestSetup.SetupKiosk();
                 var occurrence = CheckInTestSetup.SetupOccurrenceSearch(kiosk);
+				PersonCheckInRequest request = new PersonCheckInRequest
+            	                               	{
+            	                               		PersonID = person.PersonID,
+            	                               		FamilyMember = person,
+													Occurrences = new List<Occurrence> { occurrence }
+            	                               	};
 
-                Dictionary<FamilyMember, List<Occurrence>> familyMap = new Dictionary<FamilyMember, List<Occurrence>>
-                                                                           {
-                                                                               {
-                                                                                   person, 
-                                                                                   new List<Occurrence> { occurrence }
-                                                                               }
-                                                                           };
-
-                var result = CheckInController.CheckInFamily(new MockPrintLabel(), person.FamilyID, familyMap, kiosk);
+				var familyMap = new List<PersonCheckInRequest> { request };
+                var results = CheckInController.CheckInFamily(new MockPrintLabel(), person.FamilyID, familyMap, kiosk);
                 var location = new Location(occurrence.LocationID);
+				var result = results.First();
 
-                Assert.True(result.First().Contains("success"));
+                Assert.IsTrue(result.CheckInResults.All(r => r.IsCheckInSuccessful));
                 Assert.AreEqual(location.CurrentCount, 1);
             }
         }
