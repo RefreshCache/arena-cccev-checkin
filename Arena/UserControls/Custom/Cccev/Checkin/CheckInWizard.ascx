@@ -122,7 +122,6 @@
             var imgChecked = 'UserControls/Custom/Cccev/Checkin/images/checkbox.png';
             var selectedCount = 0;
             var nextButton = $('#<%= btnSelectFamilyMemberContinue.ClientID %>');
-            var nextDiv = $('#divSelectFamilyMemberContinue');
 
             $('#<%= dgFamilyMembers.ClientID %> input:submit').click(function(event)
             {
@@ -146,14 +145,12 @@
                 if (selectedCount > 0)
                 {
                     $(nextButton).removeAttr('disabled');
-                    $(nextDiv).removeAttr('disabled');
-                    $(nextDiv).removeClass('nextButtonInactive').addClass('nextButton');
+                    $(nextButton).removeClass().addClass('nextButton');
                 }
                 else
                 {
                     $(nextButton).attr('disabled', 'disabled');
-                    $(nextDiv).attr('disabled', 'disabled');
-                    $(nextDiv).removeClass('nextButton').addClass('nextButtonInactive');
+                    $(nextButton).removeClass().addClass('nextButtonInactive');
                 }
             });
 
@@ -179,14 +176,10 @@
                 if (selectedCount > 0)
                 {
                     $(nextButton).removeAttr('disabled');
-                    $(nextDiv).removeAttr('disabled');
-                    $(nextDiv).removeClass('nextButtonInactive').addClass('nextButton');
                 }
                 else
                 {
                     $(nextButton).attr('disabled', 'disabled');
-                    $(nextDiv).attr('disabled', 'disabled');
-                    $(nextDiv).removeClass('nextButton').addClass('nextButtonInactive');
                 }
             });
         }
@@ -467,21 +460,6 @@
             
     }
 
-    function disableDivAndPostBack(div)
-    {
-        if ($(div).attr('disabled') != 'disabled' && div.getAttribute('requestSent') != 'true')
-        {
-            div.style.color = '#999999';
-            div.setAttribute('requestSent', 'true');
-            $(div).prev("input").click();
-        }
-    }
-
-    Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function(sender, args)
-    {
-        $('.divButton').click(function() { disableDivAndPostBack(this); } );
-    });
-
     Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function(sender, args)
     {
         if (args.get_error() != null)
@@ -496,9 +474,6 @@
     });
 </script>
 
-<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-<script type="text/javascript" src="UserControls/Custom/Cccev/Checkin/misc/ios.js"></script>
-                    
 <script type="text/javascript">
     var isCtrlKey = false;
     var isShiftKey = false;
@@ -567,9 +542,8 @@
 	                    </div>
 	                </div>
 	                <div id="divRightFooter" runat="server" class="footerRight">
-                        <asp:Button id="btnSearchByPhone" CssClass="searchButton" style="display: none; vertical-align: middle" runat="server" Visible="false" Text="Search By Phone" 
+                        <asp:Button id="btnSearchByPhone" CssClass="searchButton" style="vertical-align: middle" runat="server" Visible="false" Text="Search By Phone" 
                             OnClick="btnSearchByPhone_Click" OnClientClick="disableButton(this);" />
-                        <div class="searchButton divButton">Search By Phone</div>
                     </div>
                     <div id="divWideFooter" runat="server" visible="false" class="footerWide">
                         <p><asp:Label ID="lblWideFooter" runat="server" /></p>
@@ -594,24 +568,24 @@
 			                    <td style="vertical-align: top;">
 				                    <table id="Table2" style="height: 302px; width: 286px; border: none; padding: 2px;" cellspacing="0">
 					                    <tr style="vertical-align: top;">
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '1' )">1</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '2' )">2</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '3' )">3</div></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '1' )" type="button" value="1"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '2' )" type="button" value="2"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '3' )" type="button" value="3"></td>
 					                    </tr>
 					                    <tr style="vertical-align: middle;">
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '4' )">4</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '5' )">5</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '6' )">6</div></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '4' )" type="button" value="4"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '5' )" type="button" value="5"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '6' )" type="button" value="6"></td>
 					                    </tr>
 					                    <tr style="vertical-align: middle;">
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '7' )">7</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '8' )">8</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '9' )">9</div></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '7' )" type="button" value="7"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '8' )" type="button" value="8"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '9' )" type="button" value="9"></td>
 					                    </tr>
 					                    <tr style="vertical-align: middle;">
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClearDigit( )">&lt;</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '0' )">0</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClearAll()">clr</div></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClearDigit( )" type="button" value="<"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '0' )" type="button" value="0"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClearAll()" type="button" value="clr"></td>
 					                    </tr>
 				                    </table>
 				                    <p>&nbsp;</p>
@@ -620,11 +594,10 @@
 			                    <td style="vertical-align: top; padding-left: 20px">
 				                    <p><div style="width: 100%;">
 				                            <div style="width: 334px; float: left;" onkeypress="javascript:return FireDefaultButton(event,'btnFamilySearch')">
-				                                <asp:textbox id="txtPhone" runat="server" CssClass="phoneText" Width="264" Height="65" MaxLength="10" />
+				                                <asp:textbox id="txtPhone" runat="server" CssClass="phoneText" Width="334" Height="75" MaxLength="10" />
 				                            </div>
 				                            <div style="width: 212px; float: left; margin-left: 15px;">
-				                                <asp:button id="btnFamilySearch" runat="server" CssClass="dataButton" style="display: none;" Text="Search" OnClick="btnFamilySearch_Click" OnClientClick="disableButton(this);" />
-                                                                <div class="dataButton divButton">Search</div>
+				                                <asp:button id="btnFamilySearch" runat="server" CssClass="dataButton" Text="Search" OnClick="btnFamilySearch_Click" OnClientClick="disableButton(this);" />
 				                            </div>
 				                        </div>
 				                        <br />
@@ -643,8 +616,7 @@
                     </div>
                     <div class="footer">
 	                    <div class="footerLeft">
-                                        <asp:button id="btnFamilySearchCancel" CssClass="cancelButton" style="display: none;" runat="server" Text="Cancel" OnClick="Cancel_Click" OnClientClick="disableButton(this);" />
-                                        <div class="cancelButton divButton">Cancel</div>
+		                        <asp:button id="btnFamilySearchCancel" CssClass="cancelButton" runat="server" Text="Cancel" OnClick="Cancel_Click" OnClientClick="disableButton(this);" />
 	                        </div>
                         </div>
                 </asp:Panel>
@@ -684,15 +656,13 @@
 
                 <div class="footer">
                     <div class="footerLeft">
-                        <asp:Button ID="btnSelectFamilyMemberCancel" runat="server" Text="Cancel" 
-                        CssClass="cancelButton" onclick="Cancel_Click" style="margin-right: 20px; display:none;" OnClientClick="disableButton(this);" />
-                        <div class="cancelButton divButton">Cancel</div>
-                    </div>
-                    <div class="footerRight">
-                        <asp:Button ID="btnSelectFamilyMemberContinue" runat="server" Text="Next" CssClass="nextButton" style="display: none;"
+                <asp:Button ID="btnSelectFamilyMemberCancel" runat="server" Text="Cancel" 
+		                CssClass="cancelButton" onclick="Cancel_Click"  style="margin-right: 20px;" OnClientClick="disableButton(this);" />
+		            </div>
+		            <div class="footerRight">
+                        <asp:Button ID="btnSelectFamilyMemberContinue" runat="server" Text="Next" CssClass="nextButton" 
                             onclick="btnSelectFamilyMemberContinue_Click" OnClientClick="disableButton(this);" />
-                        <div id="divSelectFamilyMemberContinue" class="nextButtonInactive divButton" disabled="disabled">Next</div>
-                    </div>
+		            </div>
                 </div>
             </asp:Panel>
             
@@ -702,8 +672,7 @@
                 <asp:Label ID="lblNoEligiblePeople" runat="server" CssClass="errorText" Visible="false" />
                 <div class="footer">
 	                <div class="footerLeft">
-		                <asp:button id="btnNoPeopleCancel" CssClass="cancelButton" style="display: none;" runat="server" Text="Cancel" OnClick="Cancel_Click" OnClientClick="disableButton(this);" />
-                                <div class="cancelButton divButton">Cancel</div>
+		                <asp:button id="btnNoPeopleCancel" CssClass="cancelButton" runat="server" Text="Cancel" OnClick="Cancel_Click" OnClientClick="disableButton(this);" />
 	                </div>
                 </div>
             </asp:Panel>
@@ -728,8 +697,7 @@
 
                 <div class="footer">
                     <div class="footerLeft">
-                        <asp:Button ID="btnAbilityCancel" runat="server" Text="Cancel" CssClass="cancelButton" style="display: none;" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
-                        <div class="cancelButton divButton">Cancel</div>
+                        <asp:Button ID="btnAbilityCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
                     </div>
                 </div>
                 <input type="hidden" id="ihAttendeesToProcess" runat="server" />
@@ -754,12 +722,10 @@
 
                 <div class="footer">
                     <div class="footerLeft">
-                        <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="cancelButton" style="display: none;" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
-                        <div class="cancelButton divButton">Cancel</div>
+                        <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
                     </div>
                     <div class="footerRight">
-                        <asp:Button ID="btnServicesContinue" runat="server" Text="Next" CssClass="nextButton" style="display: none;" onclick="btnServicesContinue_Click" OnClientClick="disableButton(this);" />
-                        <div class="nextButton divButton">Next</div>
+                        <asp:Button ID="btnServicesContinue" runat="server" Text="Next" CssClass="nextButton" onclick="btnServicesContinue_Click" OnClientClick="disableButton(this);" />
                     </div>
                 </div>
             </asp:Panel>
@@ -777,12 +743,10 @@
                     </div>
                     <div class="footer">
                         <div class="footerLeft">
-                            <asp:Button ID="btnConfirmCancel" runat="server" Text="Cancel" CssClass="cancelButton" style="display: none;" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
-                            <div class="cancelButton divButton">Cancel</div>
+                            <asp:Button ID="btnConfirmCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
                         </div>
                         <div class="footerRight">
-                            <asp:Button ID="btnConfirmContinue" runat="server" Text="Next" CssClass="nextButton" style="display: none;" onclick="btnConfirmContinue_Click" OnClientClick="disableButton(this);" />
-                            <div class="nextButton divButton">Next</div>
+                            <asp:Button ID="btnConfirmContinue" runat="server" Text="Next" CssClass="nextButton" onclick="btnConfirmContinue_Click" OnClientClick="disableButton(this);" />
 		                </div>
                     </div>
                 </div>
@@ -813,8 +777,7 @@
                 </div>
                 <div class="footer">
                     <div class="footerLeft">
-                        <asp:Button ID="btnTryAgain" runat="server" Text="Retry" CssClass="cancelButton" style="display: none;" onclick="btnTryAgain_Click" />
-                        <div class="cancelButton divButton">Retry</div>
+                        <asp:Button ID="btnTryAgain" runat="server" Text="Retry" CssClass="cancelButton" onclick="btnTryAgain_Click" />
 		            </div>
                 </div>
             </asp:Panel>
