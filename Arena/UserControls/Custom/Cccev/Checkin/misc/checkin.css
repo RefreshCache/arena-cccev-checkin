@@ -52,7 +52,7 @@ div.heading
 {
 	border: none;
 	text-align: center;
-	padding: 20px;
+	padding: 20px 10px 10px 10px;
 }
 
 div.footer
@@ -477,10 +477,9 @@ td.fail
 	padding-left: 10px;
 }
 
-/* fixed Bug #345 */
-.familyMemberGrid
+/* Used to center stuff (bug #345) */
+.centeredList
 {
-    margin-top: 25px;
     margin-left: auto;
     margin-right: auto;
 }
