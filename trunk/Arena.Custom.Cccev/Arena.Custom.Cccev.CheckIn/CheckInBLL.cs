@@ -4,10 +4,13 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
-* $Revision: 64 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   64   2010-11-03 15:22:06-07:00   JasonO $
+* $Revision: 65 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   65   2010-11-04 17:13:52-07:00   nicka $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
+*  
+*  Revision: 65   Date: 2010-11-05 00:13:52Z   User: nicka 
+*  Adding the remaining session constants and sorting them. 
 *  
 *  Revision: 64   Date: 2010-11-03 22:22:06Z   User: JasonO 
 *  Refactoring to bring more data regarding results of check in process out to 
@@ -140,14 +143,18 @@ namespace Arena.Custom.Cccev.CheckIn
 	[Serializable]
 	public class CheckInConstants
 	{
-		public const string SESS_STATE = "CCCEV_CHECKIN_STATE";
+		public const string SESS_ATTENDEES = "cccev_checkinAttendees";
+		public const string SESS_AUTO_ADVANCE = "autoAdvance";
+		public const string SESS_FAMILY = "cccev_checkInFamily";
 		public const string SESS_KEY_PEOPLEMAP = "cccev_peopleMap";
-        public const string SESS_FAMILY = "cccev_checkInFamily";
+		public const string SESS_KIOSK = "cccev_ckin_kiosk";
 		public const string SESS_LIST_CHECKIN_FAMILYMEMBERS = "cccev_checkinFamilyMemberList";
-        public const string SESS_ATTENDEES = "cccev_checkinAttendees";
 		public const string SESS_LIST_OCCURRENCES_CHECKIN = "cccev_checkinOccurrences";
-        public const string SESS_SERVICE_TIMES = "serviceTimes";
-        public const string SESS_RESULTS = "checkinResults";
+		public const string SESS_RESULTS = "checkinResults";
+		public const string SESS_SERVICE_TIMES = "serviceTimes";
+		public const string SESS_STATE = "CCCEV_CHECKIN_STATE";
+		public const string SESS_TOTAL_OCCURRENCES = "ckin_total_occurrences";
+		public const string SESS_UNAVAILABLE_OCCURRENCES = "ckin_unavailable_occurrences";
 	}
 
     [Serializable]
