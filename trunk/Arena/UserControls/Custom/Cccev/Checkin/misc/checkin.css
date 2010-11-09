@@ -1,11 +1,6 @@
 ﻿/*
 * $Revision$
 * $Date$ 
-*
-* SVN Keywords
-*   $Author$
-*   $Revision$
-*   $Date$
 */
 html
 {
@@ -110,9 +105,8 @@ div.footer
 .footerRight
 {
 	float: right;
-	max-width: 500px;
+	width: 500px;
 	text-align: right;
-	line-height: 118px;
 }
 
 .footerWide
@@ -204,7 +198,7 @@ h3.checkinText
 
 .phoneButton
 {
-	background-image: url(../images/phone_button.png);
+	background: url(../images/phone_button.png) no-repeat;
 	background-color: Transparent;
 	border: none;
 	font-size: 32pt;
@@ -214,6 +208,7 @@ h3.checkinText
 	cursor: default;
 	text-align: center;
 	line-height: 77px;
+	padding: 5px;
 }
 
 .scrollArea
@@ -275,9 +270,6 @@ h3.checkinText
 	border: none;
 	width: 263px;
 	height: 91px;
-	line-height: 91px;
-	text-align: center;
-	cursor: default;
 }
 
 .dataButtonInactive
@@ -413,6 +405,8 @@ input.phoneText
 	cursor: default;
 	text-align: center;
 	line-height: 118px;
+	padding-top: 20px;
+	
 }
 
 .dataStar
@@ -430,7 +424,7 @@ input.phoneText
 
 .resultTable
 {
-	font-family: "Cooper Black", "Cooper Black BT";
+	font-family: "Cooper Black", "Cooper Black BT", "Arial Rounded MT Bold";
 	font-size: 36pt;
 	color: #000000;
 }
@@ -476,6 +470,7 @@ td.fail
 	background-color: #CC0000;
 	padding-left: 10px;
 }
+
 
 /* Used to center stuff (bug #345) */
 .centeredList

@@ -2,13 +2,16 @@
 
 <asp:ScriptManagerProxy ID="smpScripts" runat="server" />
 
+<input type="hidden" name="ihTimeoutError" id="ihTimeoutError" value="<%= AsyncTimeoutErrorMessageSetting %>" />
+<input type="hidden" name="ihFamilyRegistrationPage" id="ihFamilyRegistrationPage" value="<%= FamilyRegistrationPageSetting %>" />
+
 <script type="text/javascript">
     var autoConfirmCancel = '<%= AutoCancelConfirmSetting %>' == 'true';
     var longInterval = parseInt('<%= LongRefreshTimeSetting %>');
     var shortInterval = parseInt('<%= ShortRefreshTimeSetting %>');
     var interval;
-    
-    var startTime;    
+
+    var startTime;
     var rightNow;
     var refreshSeconds = 0;
     var secondsSinceLastRefresh = 0;
@@ -18,312 +21,20 @@
     var StartTime;
     var NowTime;
 
-    function reloadBrowser()
-    {
-        window.location.reload(true);
-    }
-   
-    function refreshPage()
-    {
-        startTime = new Date();
-        startTime = startTime.getTime();
-        refreshCountDown();
-    }
-
-    function refreshCountDown()
-    {
-        if (shouldRefresh && (autoConfirmCancel || state == 'init'))
-        {
-            rightNow = new Date();
-            rightNow = rightNow.getTime();
-            secondsSinceLastRefresh = (rightNow - startTime) / 1000;
-            refreshSeconds = Math.round(interval - secondsSinceLastRefresh);
-            var timer;
-
-            if (interval >= secondsSinceLastRefresh)
-            {
-                timer = setTimeout('refreshCountDown()', 1000);
-                window.status = 'Page refresh: ' + refreshSeconds + ' State: ' + state;
-            }
-            else
-            {
-                clearTimeout(timer);
-
-                if (state == 'confirm')
-                {
-                    $get('<%= btnConfirmContinue.ClientID %>').click();
-                }
-                else
-                {
-                    $get('<%= btnRedirect.ClientID %>').click();
-                }
-            }
-        }
-        else
-        {
-            window.status = '';
-        }
-    }
-
-    function resetTimer()
-    {
-        startTime = new Date();
-        startTime = startTime.getTime();
-    }
-
-    function getState()
-    {
-        var init = $get('<%= pnlInit.ClientID %>');
-        var familySearch = $get('<%= pnlFamilySearch.ClientID %>');
-        var selectFamilyMember = $get('<%= pnlSelectFamilyMember.ClientID %>');
-        var noEligible = $get('<%= pnlNoEligiblePeople.ClientID %>');
-        var selectAbility = $get('<%= pnlSelectAbility.ClientID %>');
-        var selectService = $get('<%= pnlSelectService.ClientID %>');
-        var confirm = $get('<%= pnlConfirm.ClientID %>');
-        var results = $get('<%= pnlResults.ClientID %>');
-        var badKiosk = $get('<%= pnlBadKiosk.ClientID %>');
-        var ajaxLoading = document.getElementById('upProgress');
-        
-        interval = longInterval;
-        shouldRefresh = true;
-
-        // Get the first child of the upProgress element
-        if (ajaxLoading)
-        {
-        	ajaxLoading = ajaxLoading.childNodes.item(0);
-        	ajaxLoading.className = 'ajaxProgress';
-        }
-        
-        if (init) 
-        {
-            var timerLabel = $get('<%= lblTimeRemaining.ClientID %>');
-
-            if (timerLabel) 
-            {
-                shouldRefresh = false;
-            }
-            else 
-            {
-                state = 'init';
-                interval = shortInterval;
-                shouldRefresh = true;
-            }
-        }
-        else if (familySearch)
-        {
-            state = 'familySearch';
-            ajaxLoading.className = 'ajaxLargeProgress';
-        }
-        else if (selectFamilyMember)
-        {
-            state = 'selectFamilyMember';
-            ajaxLoading.className = 'ajaxLargeProgress';
-            var imgEmpty = 'UserControls/Custom/Cccev/Checkin/images/empty_checkbox.png';
-            var imgChecked = 'UserControls/Custom/Cccev/Checkin/images/checkbox.png';
-            var selectedCount = 0;
-            var nextButton = $('#<%= btnSelectFamilyMemberContinue.ClientID %>');
-            var nextDiv = $('#divSelectFamilyMemberContinue');
-
-            $('#<%= dgFamilyMembers.ClientID %> input:submit').click(function(event)
-            {
-                if ($(this).hasClass('dataButton'))
-                {
-                    addAttendee($(this).siblings(":last").val());
-                    $(this).removeClass().addClass('dataButtonSelected');
-                    $(this).parent().siblings(":first").children("input:first").attr('src', imgChecked);
-                    selectedCount++;
-                }
-                else
-                {
-                    removeAttendee($(this).siblings(":last").val());
-                    $(this).removeClass().addClass('dataButton');
-                    $(this).parent().siblings(":first").children("input:first").attr('src', imgEmpty);
-                    selectedCount--;
-                }
-
-                event.preventDefault();
-
-                if (selectedCount > 0)
-                {
-                    $(nextButton).removeAttr('disabled');
-                    $(nextDiv).removeAttr('disabled');
-                    $(nextDiv).removeClass('nextButtonInactive').addClass('nextButton');
-                }
-                else
-                {
-                    $(nextButton).attr('disabled', 'disabled');
-                    $(nextDiv).attr('disabled', 'disabled');
-                    $(nextDiv).removeClass('nextButton').addClass('nextButtonInactive');
-                }
-            });
-
-            $('#<%= dgFamilyMembers.ClientID %> input:image').click(function(event)
-            {
-                if ($(this).attr('src').indexOf('empty_checkbox', 0) > 0)
-                {
-                    addAttendee($(this).parent().siblings(":last").children("input:last").val());
-                    $(this).attr('src', imgChecked);
-                    $(this).parent().siblings(":last").children("input:first").removeClass().addClass('dataButtonSelected');
-                    selectedCount++;
-                }
-                else
-                {
-                    removeAttendee($(this).parent().siblings(":last").children("input:last").val());
-                    $(this).attr('src', imgEmpty);
-                    $(this).parent().siblings(":last").children("input:first").removeClass().addClass('dataButton');
-                    selectedCount--;
-                }
-
-                event.preventDefault();
-
-                if (selectedCount > 0)
-                {
-                    $(nextButton).removeAttr('disabled');
-                    $(nextDiv).removeAttr('disabled');
-                    $(nextDiv).removeClass('nextButtonInactive').addClass('nextButton');
-                }
-                else
-                {
-                    $(nextButton).attr('disabled', 'disabled');
-                    $(nextDiv).attr('disabled', 'disabled');
-                    $(nextDiv).removeClass('nextButton').addClass('nextButtonInactive');
-                }
-            });
-        }
-        else if (noEligible)
-        {
-            state = 'noEligiblePeople';
-            interval = shortInterval;
-            ajaxLoading.className = 'ajaxLargeProgress';
-        }
-        else if (selectAbility)
-        {
-            state = 'selectAbilityLevel';
-            ajaxLoading.className = 'ajaxLargeProgress';
-        }
-        else if (selectService)
-        {
-            state = 'selectService';
-            ajaxLoading.className = 'ajaxLargeProgress';
-        }
-        else if (confirm)
-        {
-            state = 'confirm';
-            interval = shortInterval;
-            ajaxLoading.className = 'ajaxLargeProgress';
-        }
-        else if (results)
-        {
-            state = 'results';
-            ajaxLoading.className = 'ajaxLargeProgress';
-        }
-        else if (badKiosk)
-        {
-            state = 'badKiosk';
-        }
-        else
-        {
-            state = 'undefined';
-        }
-    }
-
-    if (!Array.prototype.indexOf)
-    {
-        Array.prototype.indexOf = function(val)
-        {
-            var length = this.length;
-
-            var from = Number(arguments[1]) || 0;
-            from = (from < 0) ? Math.ceil(from) : Math.floor(from);
-
-            if (from < 0)
-            {
-                from += length;
-            }
-
-            for (; from < length; from++)
-            {
-                if (from in this && this[from] === val)
-                {
-                    return from;
-                }
-            }
-            
-            return -1;
-        };
-    }
-
-    function addAttendee(id)
-    {
-        var attendees = $get('<%= ihAttendeeIDs.ClientID %>');
-        var attendeeArray = new Array();
-        attendeeArray = attendees.value.split(',');
-
-        if (attendeeArray.indexOf(id) == -1)
-        {
-            if (attendees.value.length > 0)
-            {
-                attendees.value += ',';
-            }
-
-            attendees.value += id;
-        }
-    }
-
-    function removeAttendee(id)
-    {
-        var attendees = $get('<%= ihAttendeeIDs.ClientID %>');
-        var attendeeArray = new Array();
-        var newList = new String();
-        attendeeArray = attendees.value.split(',');
-
-        if (attendeeArray.indexOf(id) > -1)
-        {
-            for (var i = 0; i < attendeeArray.length; i++)
-            {
-                if (attendeeArray[i] != id)
-                {
-                    if (newList.length > 0)
-                    {
-                        newList += ',';
-                    }
-
-                    newList += attendeeArray[i];
-                }
-            }
-
-            attendees.value = newList;
-        }
-    }
-</script>
-
-<script type="text/javascript">
     var txtPhone;
-    var button;
-    var label;
-    var maxDigits;
+    var searchButton;
+    var messageLabel;
+    var maxDigits = parseInt('<%= PhoneLengthMaxSetting %>');
 
-    function pageLoad() 
+    function setupCountdown()
     {
-        txtPhone = document.getElementById('<%= txtPhone.ClientID %>');
-        button = document.getElementById('<%= btnFamilySearch.ClientID %>');
-        label = document.getElementById('<%= lblMessage.ClientID %>');
-        maxDigits = parseInt('<%= PhoneLengthMaxSetting %>');
-
-        getState();
-
-        if (autoConfirmCancel || state == 'init')
-        {
-            refreshPage();
-        }
-        
         var lblTimer = $get('<%= lblTimeRemaining.ClientID %>');
 
         if (lblTimer)
         {
             StartTime = $get('<%= ihStartTime.ClientID %>').value;
             NowTime = $get('<%= ihNowTime.ClientID %>').value;
-            
+
             if ($get('CountDown').innerHTML == '')
             {
                 StartTimer('<%= CurrentPortalPage.PortalPageID %>');
@@ -331,216 +42,18 @@
         }
     }
 
-    function FireDefaultButton(event, target) {
-        var key_Zero = 47;
-        var key_Nine = 57;
-
-        if ((event.keyCode == 13 || event.which == 13) && !(event.srcElement && (event.srcElement.tagName.toLowerCase() == 'textarea')))
+    $(function ()
+    {
+        if (window.Touch)
         {
-            var defaultButton = document.getElementById(target);
-            if (defaultButton == 'undefined') defaultButton = document.all[target];
-
-            if (defaultButton && typeof (defaultButton.click) != 'undefined')
-            {
-                Search();
-                defaultButton.click();
-
-                txtPhone.disabled = true;
-                event.cancelBubble = true;
-                if (event.stopPropagation) event.stopPropagation();
-                return false;
-            }
-        }
-        else if (event && event.keyCode >= key_Zero && event.keyCode <= key_Nine)
-        {
-            // if there are already 9 numbers then this is the 10th...
-            if (txtPhone.value.length >= 9)
-            {
-                ClickDigit(String.fromCharCode(event.keyCode));
-                txtPhone.disabled = true;
-                event.cancelBubble = true;
-                if (event.stopPropagation) event.stopPropagation();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    function GetKeys() 
-    {
-        var key_Enter = 13;
-        var key_Zero = 47;
-        var key_Nine = 57;
-
-        if (window.event && window.event.keyCode == key_Enter)
-        {
-            if (txtPhone.value.length >= maxDigits)
-            {
-                Search();
-                txtPhone.disabled = true;
-                ClickDigit('');
-                window.event.cancelBubble = true;
-                if (event.stopPropagation) event.stopPropagation();
-                return false;
-            }
-            else
-            {
-                IncompleteEntry();
-            }
-        }
-        else if (window.event && window.event.keyCode >= key_Zero && window.event.keyCode <= key_Nine)
-        {
-            // if there are already 9 numbers then this is the 10th...
-            if (txtPhone.value.length >= 9)
-            {
-                ClickDigit(String.fromCharCode(event.keyCode));
-            }
-        }
-    }
-
-    function ClickDigit(digit) {
-        txtPhone.focus();
-        if (parseInt(digit) >= 0) {
-            txtPhone.value = txtPhone.value + digit;
-        }
-
-        // once the person has entered all ten digits, submit by navigating to the
-        // same page with the digits in the txtPhone name/value pair.
-        if (txtPhone.value.length >= maxDigits) {
-            Search();
-
-            button.click();
-            txtPhone.disabled = true;
-            button.disabled = true;
-        }
-
-        return false;
-    }
-
-    function ClearDigit()
-    {
-        txtPhone.value = txtPhone.value.substring(0, txtPhone.value.length - 1);
-        txtPhone.focus();
-    }
-
-    function ClearAll()
-    {
-        txtPhone.value = '';
-        label.innerHTML = '&nbsp;';
-        div = document.getElementById('ScrollArea');
-        div.innerHTML = '';
-        txtPhone.focus();
-
-        return false;
-    }
-
-    function IncompleteEntry()
-    {
-        label.innerHTML = 'Please enter all ' + maxDigits + ' digits.';
-        $(label.id).removeClass().addClass('phoneError');
-    }
-
-    function Search()
-    {
-        div = document.getElementById('ScrollArea');
-        div.innerHTML = '';
-        label.innerHTML = 'Searching...';
-        $(label.id).removeClass().addClass('phoneSearching');
-
-        return true;
-    }
-
-    function disableButton(button)
-    {
-        button.style.color = '#999999';
-    
-        if (button.getAttribute('requestSent') != 'true')
-        {
-            button.setAttribute('requestSent', 'true');
-            return true;
-        }
-        else
-        {
-            button.disabled = true;
-            return false;
-        }
-            
-    }
-
-    function disableDivAndPostBack(div)
-    {
-        if ($(div).attr('disabled') != 'disabled' && div.getAttribute('requestSent') != 'true')
-        {
-            div.style.color = '#999999';
-            div.setAttribute('requestSent', 'true');
-            $(div).prev("input").click();
-        }
-    }
-
-    Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function(sender, args)
-    {
-        $('.divButton').click(function() { disableDivAndPostBack(this); } );
-    });
-
-    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function(sender, args)
-    {
-        if (args.get_error() != null)
-        {
-            if (args.get_response().get_statusCode() == '500')
-            {
-                args.set_errorHandled(true);
-                alert('<%= AsyncTimeoutErrorMessageSetting %>');
-                $get('<%= btnRedirect.ClientID %>').click();
-            }
+            var meta = $('<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;" />');
+            var js = $('<script type="text/javascript" src="UserControls/Custom/Cccev/CheckIn/misc/ios.js"></' + 'script>');
+            var css = $('<link type="text/css" rel="stylesheet" href="UserControls/Custom/Cccev/CheckIn/misc/ios.css" />');
+            $('head').append(meta)
+                .append(js)
+                .append(css);
         }
     });
-</script>
-
-<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-<script type="text/javascript" src="UserControls/Custom/Cccev/Checkin/misc/ios.js"></script>
-                    
-<script type="text/javascript">
-    var isCtrlKey = false;
-    var isShiftKey = false;
-
-    document.onkeyup = function(e)
-    {
-        var keyCode = (e && e.which ? e.which : event.keyCode);
-
-        if (keyCode == 16)
-        {
-            isShiftKey = false;
-        }
-
-        if (keyCode == 17)
-        {
-            isCtrlKey = false;
-        }
-    }
-
-    document.onkeydown = function(e)
-    {
-        var keyCode = (e && e.which ? e.which : event.keyCode);
-
-        if (keyCode == 16)
-        {
-            isShiftKey = true;
-        }
-
-        if (keyCode == 17)
-        {
-            isCtrlKey = true;
-        }
-
-        if (keyCode == 82 && (isCtrlKey && isShiftKey))
-        {
-            if ('<%= FamilyRegistrationPageSetting %>' != '')
-            {
-                window.location = 'default.aspx?page=<%= FamilyRegistrationPageSetting %>';
-                return false;
-            }
-        }
-    }
 </script>
 
 <asp:UpdatePanel ID="upCheckin" runat="server" UpdateMode="Always">
@@ -551,7 +64,6 @@
             </asp:Panel>
                   
             <!-- Begin Views -->
-            
             
             <asp:Panel ID="pnlInit" runat="server" DefaultButton="btnScan" CssClass="initView">
             <!-- Init State -->
@@ -567,9 +79,8 @@
 	                    </div>
 	                </div>
 	                <div id="divRightFooter" runat="server" class="footerRight">
-                        <asp:Button id="btnSearchByPhone" CssClass="searchButton" style="display: none; vertical-align: middle" runat="server" Visible="false" Text="Search By Phone" 
+                        <asp:Button id="btnSearchByPhone" CssClass="searchButton" style="vertical-align: middle" runat="server" Visible="false" Text="Search By Phone" 
                             OnClick="btnSearchByPhone_Click" OnClientClick="disableButton(this);" />
-                        <div class="searchButton divButton">Search By Phone</div>
                     </div>
                     <div id="divWideFooter" runat="server" visible="false" class="footerWide">
                         <p><asp:Label ID="lblWideFooter" runat="server" /></p>
@@ -592,26 +103,26 @@
 	                    <table style="border: none;">
 		                    <tr>
 			                    <td style="vertical-align: top;">
-				                    <table id="Table2" style="height: 302px; width: 286px; border: none; padding: 2px;" cellspacing="0">
+				                    <table id="keypad" style="height: 302px; width: 286px; border: none; padding: 2px;" cellspacing="0">
 					                    <tr style="vertical-align: top;">
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '1' )">1</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '2' )">2</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '3' )">3</div></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '1' )" type="button" value="1" /></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '2' )" type="button" value="2" /></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '3' )" type="button" value="3" /></td>
 					                    </tr>
 					                    <tr style="vertical-align: middle;">
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '4' )">4</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '5' )">5</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '6' )">6</div></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '4' )" type="button" value="4" /></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '5' )" type="button" value="5" /></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '6' )" type="button" value="6" /></td>
 					                    </tr>
 					                    <tr style="vertical-align: middle;">
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '7' )">7</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '8' )">8</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '9' )">9</div></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '7' )" type="button" value="7" /></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '8' )" type="button" value="8" /></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '9' )" type="button" value="9" /></td>
 					                    </tr>
 					                    <tr style="vertical-align: middle;">
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClearDigit( )">&lt;</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClickDigit( '0' )">0</div></td>
-                                                                    <td style="vertical-align: middle; text-align: center;"><div class="phoneButton" onclick="return ClearAll()">clr</div></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClearDigit( )" type="button" value="&lt;"></td>
+						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '0' )" type="button" value="0" /></td>
+						                    <td style="vertical-align: middle;"><input class="phoneButton" onclick="return ClearAll()" type="button" value="clr" /></td>
 					                    </tr>
 				                    </table>
 				                    <p>&nbsp;</p>
@@ -620,17 +131,16 @@
 			                    <td style="vertical-align: top; padding-left: 20px">
 				                    <p><div style="width: 100%;">
 				                            <div style="width: 334px; float: left;" onkeypress="javascript:return FireDefaultButton(event,'btnFamilySearch')">
-				                                <asp:textbox id="txtPhone" runat="server" CssClass="phoneText" Width="264" Height="65" MaxLength="10" />
+				                                <asp:textbox id="txtPhone" runat="server" CssClass="phoneText" Width="334" Height="75" MaxLength="10" />
 				                            </div>
 				                            <div style="width: 212px; float: left; margin-left: 15px;">
-				                                <asp:button id="btnFamilySearch" runat="server" CssClass="dataButton" style="display: none;" Text="Search" OnClick="btnFamilySearch_Click" OnClientClick="disableButton(this);" />
-                                                                <div class="dataButton divButton">Search</div>
+				                                <asp:button id="btnFamilySearch" runat="server" CssClass="dataButton" Text="Search" OnClick="btnFamilySearch_Click" OnClientClick="disableButton(this);" />
 				                            </div>
 				                        </div>
 				                        <br />
 					                    <asp:Label id="lblMessage" runat="server" CssClass="checkinCaption" /></p>
 				                    <div class="scrollArea" id="ScrollArea">
-				                        <asp:datalist id="dgFamilies" runat="server" RepeatColumns="1" CellSpacing="5" DataKeyField="FamilyID" 
+				                        <asp:datalist CssClass="centeredList" GridLines="None" id="dgFamilies" runat="server" RepeatColumns="1" CellSpacing="5" DataKeyField="FamilyID" 
 				                            OnSelectedIndexChanged="dgFamilies_SelectedIndexChanged" OnItemDataBound="dgFamilies_ItemDataBound">
 						                    <ItemTemplate>
 							                    <asp:Button runat="server" ID="FamilyID" CommandName="Select" CausesValidation="false" CssClass="nameButton" />
@@ -643,8 +153,7 @@
                     </div>
                     <div class="footer">
 	                    <div class="footerLeft">
-                                        <asp:button id="btnFamilySearchCancel" CssClass="cancelButton" style="display: none;" runat="server" Text="Cancel" OnClick="Cancel_Click" OnClientClick="disableButton(this);" />
-                                        <div class="cancelButton divButton">Cancel</div>
+		                        <asp:button id="btnFamilySearchCancel" CssClass="cancelButton" runat="server" Text="Cancel" OnClick="Cancel_Click" OnClientClick="disableButton(this);" />
 	                        </div>
                         </div>
                 </asp:Panel>
@@ -664,7 +173,7 @@
                         <p class="checkinText">Select All People Attending Today</p>
                     </div>
                     <div class="resultScrollArea">
-                        <!-- #349 --><asp:DataList id="dgFamilyMembers" runat="server" DataKeyField="PersonID" CssClass="familyMemberGrid"
+                        <!-- #349 --><asp:DataList id="dgFamilyMembers" runat="server" DataKeyField="PersonID" CssClass="centeredList"
 		                    CellSpacing="5" RepeatColumns="1" BorderColor="Black" BorderWidth="0" Width="353"
 		                    OnItemDataBound="dgFamilyMembers_ItemDataBound" ItemStyle-HorizontalAlign="Left" GridLines="None">
                             <ItemStyle HorizontalAlign="Left"></ItemStyle>
@@ -684,15 +193,13 @@
 
                 <div class="footer">
                     <div class="footerLeft">
-                        <asp:Button ID="btnSelectFamilyMemberCancel" runat="server" Text="Cancel" 
-                        CssClass="cancelButton" onclick="Cancel_Click" style="margin-right: 20px; display:none;" OnClientClick="disableButton(this);" />
-                        <div class="cancelButton divButton">Cancel</div>
-                    </div>
-                    <div class="footerRight">
-                        <asp:Button ID="btnSelectFamilyMemberContinue" runat="server" Text="Next" CssClass="nextButton" style="display: none;"
+                <asp:Button ID="btnSelectFamilyMemberCancel" runat="server" Text="Cancel" 
+		                CssClass="cancelButton" onclick="Cancel_Click"  style="margin-right: 20px;" OnClientClick="disableButton(this);" />
+		            </div>
+		            <div class="footerRight">
+                        <asp:Button ID="btnSelectFamilyMemberContinue" runat="server" Text="Next" CssClass="nextButton" 
                             onclick="btnSelectFamilyMemberContinue_Click" OnClientClick="disableButton(this);" />
-                        <div id="divSelectFamilyMemberContinue" class="nextButtonInactive divButton" disabled="disabled">Next</div>
-                    </div>
+		            </div>
                 </div>
             </asp:Panel>
             
@@ -702,8 +209,7 @@
                 <asp:Label ID="lblNoEligiblePeople" runat="server" CssClass="errorText" Visible="false" />
                 <div class="footer">
 	                <div class="footerLeft">
-		                <asp:button id="btnNoPeopleCancel" CssClass="cancelButton" style="display: none;" runat="server" Text="Cancel" OnClick="Cancel_Click" OnClientClick="disableButton(this);" />
-                                <div class="cancelButton divButton">Cancel</div>
+		                <asp:button id="btnNoPeopleCancel" CssClass="cancelButton" runat="server" Text="Cancel" OnClick="Cancel_Click" OnClientClick="disableButton(this);" />
 	                </div>
                 </div>
             </asp:Panel>
@@ -715,7 +221,7 @@
                     <div class="heading">
 	                    <h3 class="checkinText"><asp:Label ID="lblPersonName" runat="server" /></h3>
 	                </div>
-	                <asp:DataList id="dgAbilities" runat="server" DataKeyField="LookupID" 
+	                <asp:DataList CssClass="centeredList" GridLines="None" id="dgAbilities" runat="server" DataKeyField="LookupID" 
 		                CellSpacing="5" RepeatColumns="1" BorderColor="Black" 
 		                onselectedindexchanged="dgAbilities_SelectedIndexChanged" ItemStyle-HorizontalAlign="Left">
 		                <ItemTemplate>
@@ -728,8 +234,7 @@
 
                 <div class="footer">
                     <div class="footerLeft">
-                        <asp:Button ID="btnAbilityCancel" runat="server" Text="Cancel" CssClass="cancelButton" style="display: none;" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
-                        <div class="cancelButton divButton">Cancel</div>
+                        <asp:Button ID="btnAbilityCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
                     </div>
                 </div>
                 <input type="hidden" id="ihAttendeesToProcess" runat="server" />
@@ -742,7 +247,7 @@
                     <div class="heading">
                         <h3 class="checkinText">Select Services</h3>
                     </div>
-                    <asp:DataList ID="dgEventTimes" runat="server" CellSpacing="5" RepeatColumns="1" BorderColor="Black" BorderWidth="0" Width="350" 
+                    <asp:DataList CssClass="centeredList" GridLines="None" ID="dgEventTimes" runat="server" CellSpacing="5" RepeatColumns="1" BorderColor="Black" BorderWidth="0" Width="350" 
                         OnSelectedIndexChanged="dgEventTimes_SelectedIndexChanged" OnItemDataBound="dgEventTimes_ItemDataBound" ItemStyle-HorizontalAlign="Left">
                         <ItemTemplate>
                             <div class="item">
@@ -754,12 +259,10 @@
 
                 <div class="footer">
                     <div class="footerLeft">
-                        <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="cancelButton" style="display: none;" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
-                        <div class="cancelButton divButton">Cancel</div>
+                        <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
                     </div>
                     <div class="footerRight">
-                        <asp:Button ID="btnServicesContinue" runat="server" Text="Next" CssClass="nextButton" style="display: none;" onclick="btnServicesContinue_Click" OnClientClick="disableButton(this);" />
-                        <div class="nextButton divButton">Next</div>
+                        <asp:Button ID="btnServicesContinue" runat="server" Text="Next" CssClass="nextButton" onclick="btnServicesContinue_Click" OnClientClick="disableButton(this);" />
                     </div>
                 </div>
             </asp:Panel>
@@ -777,12 +280,10 @@
                     </div>
                     <div class="footer">
                         <div class="footerLeft">
-                            <asp:Button ID="btnConfirmCancel" runat="server" Text="Cancel" CssClass="cancelButton" style="display: none;" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
-                            <div class="cancelButton divButton">Cancel</div>
+                            <asp:Button ID="btnConfirmCancel" runat="server" Text="Cancel" CssClass="cancelButton" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
                         </div>
                         <div class="footerRight">
-                            <asp:Button ID="btnConfirmContinue" runat="server" Text="Next" CssClass="nextButton" style="display: none;" onclick="btnConfirmContinue_Click" OnClientClick="disableButton(this);" />
-                            <div class="nextButton divButton">Next</div>
+                            <asp:Button ID="btnConfirmContinue" runat="server" Text="Next" CssClass="nextButton" onclick="btnConfirmContinue_Click" OnClientClick="disableButton(this);" />
 		                </div>
                     </div>
                 </div>
@@ -813,8 +314,7 @@
                 </div>
                 <div class="footer">
                     <div class="footerLeft">
-                        <asp:Button ID="btnTryAgain" runat="server" Text="Retry" CssClass="cancelButton" style="display: none;" onclick="btnTryAgain_Click" />
-                        <div class="cancelButton divButton">Retry</div>
+                        <asp:Button ID="btnTryAgain" runat="server" Text="Retry" CssClass="cancelButton" onclick="btnTryAgain_Click" />
 		            </div>
                 </div>
             </asp:Panel>

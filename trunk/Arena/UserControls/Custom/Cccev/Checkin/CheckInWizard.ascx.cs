@@ -4,10 +4,22 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInWizard.ascx.cs $
-* $Revision: 62 $ 
-* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   62   2010-11-04 13:04:37-07:00   JasonO $
+* $Revision: 66 $ 
+* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   66   2010-11-09 11:52:24-07:00   JasonO $
 * 
 * $Log: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs $
+*  
+*  Revision: 66   Date: 2010-11-09 18:52:24Z   User: JasonO 
+*  
+*  Revision: 65   Date: 2010-11-09 00:27:50Z   User: JasonO 
+*  Committing iOS changes. 
+*  
+*  Revision: 64   Date: 2010-11-08 18:25:23Z   User: JasonO 
+*  Cleaning up client-side code. 
+*  
+*  Revision: 63   Date: 2010-11-05 00:50:17Z   User: nicka 
+*  Made session variables constants, fixed exception on first use bug (#351), 
+*  centered all lists/grids. 
 *  
 *  Revision: 62   Date: 2010-11-04 20:04:37Z   User: JasonO 
 *  More cleanup. 
@@ -252,7 +264,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
 #endif
 
             smpScripts.Scripts.Add(new ScriptReference(string.Format("~/{0}", BasePage.JQUERY_INCLUDE)));
-            smpScripts.Scripts.Add(new ScriptReference("~/UserControls/Custom/Cccev/CheckIn/misc/countdown.js"));
+            smpScripts.Scripts.Add(new ScriptReference("~/UserControls/Custom/Cccev/CheckIn/misc/checkin-core.js"));
             Page.Header.Controls.Add(new LiteralControl(string.Format("<link type=\"text/css\" rel=\"stylesheet\" href=\"{0}\" />", CssPathSetting)));
         }
 
@@ -267,7 +279,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             if (!Page.IsPostBack)
             {
                 ShowView();
-                Session["autoAdvance"] = true;
+                Session[CheckInConstants.SESS_AUTO_ADVANCE] = true;
                 btnRedirect.Style.Add("visibility", "hidden");
             }
         }
@@ -300,7 +312,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
                 case CheckInStates.FamilySearch:
                 case CheckInStates.SelectFamilyMember:
                 case CheckInStates.NoEligiblePeople:
-                    Session["autoAdvance"] = true;
+                    Session[CheckInConstants.SESS_AUTO_ADVANCE] = true;
                     state = CheckInStates.Init;
                     Session[CheckInConstants.SESS_STATE] = state;
 
@@ -313,13 +325,13 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
                 case CheckInStates.SelectAbility:
                 case CheckInStates.SelectService:
                 case CheckInStates.Confirm:
-                    Session["autoAdvance"] = false;
+                    Session[CheckInConstants.SESS_AUTO_ADVANCE] = false;
                     ResetFamily();
                     state = CheckInStates.SelectFamilyMember;
                     Session[CheckInConstants.SESS_STATE] = state;
                     break;
                 default:
-                    Session["autoAdvance"] = true;
+                    Session[CheckInConstants.SESS_AUTO_ADVANCE] = true;
                     ResetFamily();
                     state = CheckInStates.SelectFamilyMember;
                     Session[CheckInConstants.SESS_STATE] = state;
@@ -351,9 +363,11 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             {
                 // Reset session values for next person to check in.
                 // Only done if in init state.
+				Session[CheckInConstants.SESS_AUTO_ADVANCE] = true;		// #351
                 Session[CheckInConstants.SESS_LIST_OCCURRENCES_CHECKIN] = null;
                 Session[CheckInConstants.SESS_FAMILY] = null;
                 Session[CheckInConstants.SESS_LIST_CHECKIN_FAMILYMEMBERS] = null;
+
                 ResetFamily();
             }
         }
@@ -364,8 +378,8 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             Session[CheckInConstants.SESS_SERVICE_TIMES] = null;
             Session[CheckInConstants.SESS_KEY_PEOPLEMAP] = null;
             Session[CheckInConstants.SESS_RESULTS] = null;
-            Session["ckin_unavailable_occurrences"] = null;
-            Session["ckin_total_occurrences"] = null;
+            Session[CheckInConstants.SESS_UNAVAILABLE_OCCURRENCES] = null;
+            Session[CheckInConstants.SESS_TOTAL_OCCURRENCES] = null;
             ihAttendeesToProcess.Value = Constants.NULL_STRING;
             ihAttendeeIDs.Value = Constants.NULL_STRING;
         }
@@ -384,7 +398,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
 				
                 if (computer != null)
                 {
-					Session[ "cccev_ckin_kiosk" ] = computer;
+					Session[CheckInConstants.SESS_KIOSK] = computer;
                     occurrences = CheckInController.GetOccurrences(lookAhead, DateTime.Now, computer);
                     Session[CheckInConstants.SESS_LIST_OCCURRENCES_CHECKIN] = occurrences;
                 }
@@ -732,7 +746,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
                     if (pplToCheckIn.Count > 0)
                     {
                         Session[CheckInConstants.SESS_LIST_CHECKIN_FAMILYMEMBERS] = SetCheckInPeople(pplToCheckIn);
-                        bool autoAdvance = (bool)Session["autoAdvance"];
+                        bool autoAdvance = (bool)Session[CheckInConstants.SESS_AUTO_ADVANCE];
 
                         // Will auto advance view if we've set autoAdvance to "true" and there is only one child to check in.
                         if (pplToCheckIn.Count == 1 && autoAdvance)
@@ -1032,7 +1046,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             // All occurrences at location within the selected time range
             var serviceTimes = (from o in occurrences
                                 select o.StartTime).Distinct();
-            bool autoAdvance = (bool)Session["autoAdvance"];
+            bool autoAdvance = (bool)Session[CheckInConstants.SESS_AUTO_ADVANCE];
 
             if (serviceTimes.Count() == 1 && autoAdvance)
             {
@@ -1099,14 +1113,24 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
                     // disable all items that follow the current item in the datalist
                     foreach (DataListItem item in dgEventTimes.Items)
                     {
+                        Button b = (Button)item.FindControl("btnService");
+                        Image i = (Image)item.FindControl("imgChecked");
+
                         if (item.ItemIndex > selectedIndex)
                         {
-                            Button b = (Button)item.FindControl("btnService");
                             b.Enabled = false;
                             b.CssClass = "dataButtonInactive";
 
                             imgChecked = (Image)item.FindControl("imgChecked");
                             imgChecked.ImageUrl = EMPTY_CHECK_BOX_IMG_URL;
+                        }
+                        else
+                        {
+                            if (b.Enabled && i.ImageUrl == CHECK_BOX_IMG_URL)
+                            {
+                                btnServicesContinue.Enabled = true;
+                                btnServicesContinue.CssClass = "nextButton";
+                            }
                         }
                     }
                 }
@@ -1156,7 +1180,7 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
 
             if (serviceTimes.Count > 0)
             {
-                Session["autoAdvance"] = true;
+                Session[CheckInConstants.SESS_AUTO_ADVANCE] = true;
                 Session[CheckInConstants.SESS_SERVICE_TIMES] = serviceTimes;
                 state = CheckInStates.Confirm;
                 Session[CheckInConstants.SESS_STATE] = state;
@@ -1206,8 +1230,8 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             }
 
             phConfirm.Controls.Add(table);
-            Session["ckin_unavailable_occurrences"] = totalUnavailable;
-            Session["ckin_total_occurrences"] = totalClasses;
+            Session[CheckInConstants.SESS_UNAVAILABLE_OCCURRENCES] = totalUnavailable;
+            Session[CheckInConstants.SESS_TOTAL_OCCURRENCES] = totalClasses;
         }
 
         private HtmlTableRow BuildHeaderRow()
@@ -1322,12 +1346,12 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
 
         protected void btnConfirmContinue_Click(object sender, EventArgs e)
         {
-            int unavailableClasses = int.Parse(Session["ckin_unavailable_occurrences"].ToString());
-            int totalClasses = int.Parse(Session["ckin_total_occurrences"].ToString());
+            int unavailableClasses = int.Parse(Session[CheckInConstants.SESS_UNAVAILABLE_OCCURRENCES].ToString());
+            int totalClasses = int.Parse(Session[CheckInConstants.SESS_TOTAL_OCCURRENCES].ToString());
 
             // submit registration and display result
             var requests = (List<PersonCheckInRequest>) Session[CheckInConstants.SESS_KEY_PEOPLEMAP];
-			ComputerSystem kiosk = (ComputerSystem)Session[ "cccev_ckin_kiosk" ];
+			ComputerSystem kiosk = (ComputerSystem)Session[CheckInConstants.SESS_KIOSK];
 			var results = CheckInController.CheckInFamily(int.Parse(PrintProviderSetting),
 				((Family) Session[CheckInConstants.SESS_FAMILY]).FamilyID, requests, kiosk);
             Session[CheckInConstants.SESS_RESULTS] = results;
