@@ -18,16 +18,6 @@ Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function (sender, a
     initPage();
 });
 
-Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function(sender, args)
-{
-    $('.scroll-pane').jScrollPane({
-            showArrows : true,
-            arrowButtonSpeed : 15,
-            arrowRepeatFreq : 250,
-            hideFocus : true
-    });
-});
-
 function initPage()
 {
     getState();
@@ -36,6 +26,13 @@ function initPage()
     {
         refreshPage();
     }
+
+    $('.scroll-pane').jScrollPane({
+        showArrows : true,
+        arrowButtonSpeed : 15,
+        arrowRepeatFreq : 250,
+        hideFocus : true
+    });
 }
 
 function reloadBrowser()
