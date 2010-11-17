@@ -12,36 +12,52 @@ body
 	margin: 0px;
 	padding: 0px;
 	overflow: hidden;
+	color: #000000;
+	line-height: normal;
+}
+
+body, a, input, div, span, li, td, p, span.footerText, .resultTable
+{
 	font-family: "Cooper Black", "Cooper Black BT", "Arial Rounded MT Bold";
 }
 
-a, input, div, span, li, td, p, span.footerText
+table, tr, td, th
 {
-	font-family: "Cooper Black", "Cooper Black BT", "Arial Rounded MT Bold";
+    border: none;
+}
+
+td
+{
+    vertical-align: top;
 }
 
 .container
 {
-	width: 1024px;
-	height: 768px;
-	background-image: url(../images/checkin_bg.png);
-	background-repeat: no-repeat;
-}
-
-.view
-{
-	width: 1024px;
-	height: 768px;
-	vertical-align: top;
-	text-align: center;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 0;
+	background: url(../images/checkin_bg.png) no-repeat;
 }
 
 .initView
 {
-	width: 1024px;
-	height: 768px;
-	vertical-align: bottom;
+	width: 100% !important;
+	height: 100% !important;
+	min-height: 700px;
 }
+
+    #divPanicButton
+    {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100px;
+        width: 100px;
+        z-index: 3;
+    }
 
 div.heading
 {
@@ -50,20 +66,26 @@ div.heading
 	padding: 20px 10px 10px 10px;
 }
 
+.view > .content
+{
+    text-align: center;
+}
+
 div.footer
 {
-	background-image: url(../images/footer_bg.png);
-	background-repeat: no-repeat;
-	width: 1024px;
-	height: 118px;
+	background: url(../images/footer_bg.png) no-repeat;
+	width: 100%;
+	height: auto;
+	min-height: 118px;
 	position: absolute;
 	bottom: 0;
 	left: 0;
+	z-index: 1;
 }
 
 .invis
 {
-	visibility: hidden;
+	display: none;
 }
 
 .footerText
@@ -72,7 +94,24 @@ div.footer
 	font-size: 32pt;
 	display: block;
 	margin: 40px 0 0 20px;
-    padding-bottom: 25px;
+	line-height: normal;
+}
+
+.divScanBox
+{
+    display: none;
+}
+    
+.divScanNow
+{
+    float: left;
+    height: 100px;
+}
+    
+.footerWide > .countdown
+{
+    display: block;
+    text-align: left;
 }
 
 .footerCaption
@@ -97,49 +136,56 @@ div.footer
 .footerLeft
 {
 	float: left;
-	width: 500px;
-	height: 118px;
+	width: 49%;
+	height: 100%;
 	text-align: left;
 }
 
 .footerRight
 {
 	float: right;
-	width: 500px;
+	width: 49%;
+	height: 100%;
 	text-align: right;
 }
 
 .footerWide
 {
-	width: 1024px;
-	height: 118px;
+	height: 100%;
 	text-align: center;
+}
+
+    #divRightFooter .searchButton
+    {
+        vertical-align: middle;
+    }
+
+#divTimer
+{
+    text-align: left;
 }
 
 .checkinText
 {
 	font-size: 36pt;
-	color: #000000;
+	color: #000;
 }
 
 h3.checkinText
 {
 	font-size: 48pt;
-	color: #000000;
 	border: none;
 }
 
 .confirmText
 {
 	font-size: 36pt;
-	color: #000000;
 }
 
 .classroomText
 {
 	font-size: 36pt;
 	color: #009900;
-	
 	filter: Shadow(Color=#000000, Direction=135, Strength=5);
 }
 
@@ -148,14 +194,12 @@ h3.checkinText
 	font-size: 36pt;
 	color: #CC0000;
 	margin: 20px;
-	padding-bottom: 20px;
-	padding-top: 20px;
+	padding: 20px 0px;
 	display: block;
 }
 
 .checkinCaption
 {
-	font-weight: normal;
 	font-size: 24pt;
 	color: #444444;
 	border: none;
@@ -163,24 +207,38 @@ h3.checkinText
 
 .errorCaption
 {
-	font-weight: normal;
 	font-size: 18pt;
 	color: #CC0000;
 	border: none;
 }
 
+.phone-search 
+{
+    margin-top: 20px;
+}
+
+    #keypad
+    {
+        height: 302px; 
+        width: 286px; 
+        padding: 2px;
+    }
+
+        #keypad td
+        {
+            text-align: center;
+        }
+
 .phoneError
 {
-    font-weight: normal;
-	font-size: 24pt;
+    font-size: 24pt;
 	color: #CC0000;
 	border: none;
 }
 
 .phoneSearching
 {
-    font-weight: normal;
-	font-size: 24pt;
+    font-size: 24pt;
 	color: #1B4472;
 	border: none;
 }
@@ -194,12 +252,14 @@ h3.checkinText
 .phonePanel
 {
 	overflow: auto;
+	text-align: center; 
+	padding-top: 10px; 
+	margin-left: 40px;
 }
 
 .phoneButton
 {
 	background: url(../images/phone_button.png) no-repeat;
-	background-color: Transparent;
 	border: none;
 	font-size: 32pt;
 	color: #FFFFFF;
@@ -207,7 +267,6 @@ h3.checkinText
 	width: 95px;
 	cursor: default;
 	text-align: center;
-	line-height: 77px;
 	padding: 5px;
 }
 
@@ -218,22 +277,16 @@ h3.checkinText
 	overflow: auto;
 	text-align: left;
 	
-	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
-	scrollbar-face-color: #000000;
-	scrollbar-highlight-color: #888888;
-	scrollbar-shadow-color: #000000;
-	scrollbar-3dlight-color: #888888;
-	scrollbar-arrow-color: #CCFFFF;
-	scrollbar-track-color: #999999;
-	scrollbar-darkshadow-color: #000000;
-	
 }
 
-.scrollAreaBig
+.scrollAreaBig, .resultScrollArea
 {
 	height: 420px;
-	width: 1024px;
+	width: 1000px;
 	overflow: auto;
+<<<<<<< .mine
+	text-align: left;
+=======
 	text-align: left;
 	
 	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
@@ -244,10 +297,19 @@ h3.checkinText
 	scrollbar-arrow-color: #CCFFFF;
 	scrollbar-track-color: #999999;
 	scrollbar-darkshadow-color: #000000;
+>>>>>>> .r31
+}
+
+.scrollAreaBig
+{
+    padding-left: 20px;
 }
 
 .resultScrollArea
 {
+<<<<<<< .mine
+	height: 420px;
+=======
 	height: 450px;
 	width: 1024px;
 	overflow: auto;
@@ -261,15 +323,57 @@ h3.checkinText
 	scrollbar-arrow-color: #CCFFFF;
 	scrollbar-track-color: #999999;
 	scrollbar-darkshadow-color: #000000;
+>>>>>>> .r31
 }
+
+.family-search-controls
+{
+    width: 100%;
+}
+
+    .family-search-controls .controls
+    {
+        width: 100%;
+    }
+
+        .controls > #phone-textbox
+        {
+            width: 334px; 
+            float: left;
+        }
+    
+        .controls > #phone-search-button
+        {
+            width: 212px;
+            float: left;
+            margin-left: 15px;
+        }
+
+.family-member
+{
+    width: 338px;
+}
+
+    .family-member-button
+    {
+        width: 263px;
+        height: 91px;
+        text-align: left;
+        float: left;
+    }
+    
+    .family-member-checkbox
+    {
+        width: 75px;
+        height: 47px;
+        float: left;
+    }
 
 .dataButton
 {
 	color: #FFFFFF;
 	font-size: 28pt;
-	background-image: url(../images/button_active.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/button_active.png) no-repeat;
 	border: none;
 	width: 263px;
 	height: 91px;
@@ -279,33 +383,27 @@ h3.checkinText
 {
 	color: #FFFFFF;
 	font-size: 28pt;
-	background-image: url(../images/button_inactive.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/button_inactive.png) no-repeat;
 	border: none;
 	width: 263px;
 	height: 91px;
 }
 
-input.dataButtonSelected
+.dataButtonSelected
 {
 	color: #FFFFFF;
 	font-size: 28pt;
-	background-image: url(../images/button_selected.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/button_selected.png) no-repeat;
 	border: none;
 	width: 263px;
 	height: 91px;
 }
 
-input.nameButton
+.nameButton
 {
 	color: #FFFFFF;
 	font-size: 20pt;
-	background-image: url(../images/name_button.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/name_button.png) no-repeat;
 	border: none;
 	width: 350px;
 	height: 91px;
@@ -315,18 +413,14 @@ input.nameButton
 
 .nextButton
 {
-	color: #000000;
 	font-size: 30pt;
-	background-image: url(../images/next_button5.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/next_button5.png) no-repeat;
 	border: none;
 	width: 216px;
 	height: 118px;
 	padding-right: 30px;
 	margin-right: 50px;
 	text-align: center;
-	line-height: 118px;
 	cursor: default;
 }
 
@@ -334,26 +428,20 @@ input.nameButton
 {
 	color: #444444;
 	font-size: 30pt;
-	background-image: url(../images/next_button4.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/next_button4.png) no-repeat;
 	border: none;
 	width: 216px;
 	height: 118px;
 	padding-right: 30px;
 	margin-right: 50px;
 	text-align: center;
-	line-height: 118px;
 	cursor: default;
 }
 
 .phoneSearch
 {
 	font-size: 28pt;
-	color: #000000;
-	background-image: url(../images/phone_search3.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/phone_search3.png) no-repeat;
 	width: 212px;
 	height: 75px;
 	border: none;
@@ -361,16 +449,12 @@ input.nameButton
 	padding-bottom: 7px;
 	cursor: default;
 	text-align: center;
-	line-height: 75px;
 }
 
 input.phoneText
 {
 	font-size: 30pt;
-	color: #000000;
-	background-image: url(../images/text_box.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/text_box.png) no-repeat;
 	border: none;
 	height: 75px;
 	width: 334px;
@@ -381,70 +465,67 @@ input.phoneText
 .cancelButton
 {
 	font-size: 30pt;
-	color: #000000;
-	background-image: url(../images/cancel_button.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/cancel_button.png) no-repeat;
 	margin-left: 50px;
 	border: none;
 	height: 118px;
 	width: 177px;
 	cursor: default;
 	text-align: center;
-	line-height: 118px;
 }
 
 .searchButton
 {
-	color: #000000;
 	font-size: 32pt;
 	margin-right: 20px;
-	background-image: url(../images/search_button.png);
-	background-color: Transparent;
+	background: url(../images/search_button.png);
 	border: none;
 	width: 420px;
 	height: 118px;
 	padding-top: 7px;
 	cursor: default;
 	text-align: center;
-	line-height: 118px;
 	padding-top: 20px;
 	
 }
 
 .dataStar
 {
-	margin-left: 10px;
-	margin-right: 30px;
-	margin-top: 20px;
+	margin: 20px 30px 0px 10px;
 }
 
-.star
+.item
 {
-	margin-left: 15px;
-	margin-bottom: 20px;
+    height: 90px;
+    position: relative;
 }
+
+    .item .star
+    {
+	    display: block;
+	    height: 40px;
+	    width: 40px;
+	    position: absolute;
+	    right: 28px;
+	    top: 20px;
+    }
 
 .resultTable
 {
-	font-family: "Cooper Black", "Cooper Black BT", "Arial Rounded MT Bold";
 	font-size: 36pt;
-	color: #000000;
 }
 
 table.resultTable
 {
 	width: 950px;
 	border: none;
-	margin-left: auto;
-	margin-right: auto;
+	margin: 0px auto;
 }
 
 td.resultTable
 {
 	text-align: left;
-	padding-right: 20px;
-	padding-bottom: 10px;
+	padding: 0px 0px 10px 20px;
 }
 
 .success
@@ -457,9 +538,7 @@ td.success
 {
 	height: 48px;
 	width: 48px;
-	background-image: url(../images/checkmark.png);
-	background-color: Transparent;
-	background-repeat: no-repeat;
+	background: url(../images/checkmark.png) no-repeat;
 }
 
 .fail
@@ -472,63 +551,33 @@ td.fail
 {
 	background-color: #CC0000;
 	padding-left: 10px;
+	color: #ffffff;
 }
 
 
 /* Used to center stuff (bug #345) */
 .centeredList
 {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0px auto;
 }
-
-/***********************************************
- * This is the original class which is included
- * in the Arena.css
- ***********************************************
-.ajaxProgress
-{
-	background-color: #e5e3e4;
-	padding: 5px;
-	color: #000;
-	font-family: Arial;
-	font-size: 10pt;
-	font-weight: 700;
-	opacity:.50;
-	filter: alpha(opacity=50); 
-	-moz-opacity: 0.5;
-	height: 18px;
-	width: 80px;
-	text-align: center;
-}
-*/
 
 .ajaxProgress
 {
-	margin-left: auto ;
-	margin-right: 0 ;
+	margin: 0px 0px 0px auto;
 }
 
 .ajaxLargeProgress
 {
-	background-color: #000;
-	
-	padding: 0px;
-	color: #000;
-	font-family: Arial;
-	font-size: 30pt;
-	font-weight: normal;
+    padding: 0px;
 	opacity:.50;
 	filter: alpha(opacity=50); 
 	-moz-opacity: 0.5;
-	text-align: center;
 	position: absolute;
-	top: 0;
-	left: 0;
-	background-image: url(../images/big_roller.gif);
-	/* background-attachment:fixed; */
+	top: 0 !important;
+	left: 0 !important;
+	right: 0 !important;
+	bottom: 0 !important;
+	background: #000 url(../images/big_roller.gif) no-repeat;
 	background-position: 50%;
-	background-repeat: no-repeat;
-	width: 1024px;
-	height: 768px;
+	z-index: 5;
 }
