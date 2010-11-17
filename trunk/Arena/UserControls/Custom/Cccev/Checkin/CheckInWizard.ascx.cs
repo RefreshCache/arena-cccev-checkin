@@ -4,10 +4,14 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInWizard.ascx.cs $
-* $Revision: 66 $ 
-* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   66   2010-11-09 11:52:24-07:00   JasonO $
+* $Revision: 68 $ 
+* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   68   2010-11-17 14:17:00-07:00   JasonO $
 * 
 * $Log: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs $
+*  
+*  Revision: 68   Date: 2010-11-17 21:17:00Z   User: JasonO 
+*  
+*  Revision: 67   Date: 2010-11-17 21:06:50Z   User: JasonO 
 *  
 *  Revision: 66   Date: 2010-11-09 18:52:24Z   User: JasonO 
 *  
@@ -267,7 +271,9 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
 #endif
 
             smpScripts.Scripts.Add(new ScriptReference(string.Format("~/{0}", BasePage.JQUERY_INCLUDE)));
+            smpScripts.Scripts.Add(new ScriptReference("~/UserControls/Custom/Cccev/CheckIn/misc/jquery.jscrollpane.js"));
             smpScripts.Scripts.Add(new ScriptReference("~/UserControls/Custom/Cccev/CheckIn/misc/checkin-core.js"));
+            Page.Header.Controls.Add(new LiteralControl("<link type=\"text/css\" rel=\"stylesheet\" href=\"UserControls/Custom/Cccev/CheckIn/misc/jquery.jscrollpane.css\" />"));
             Page.Header.Controls.Add(new LiteralControl(string.Format("<link type=\"text/css\" rel=\"stylesheet\" href=\"{0}\" />", CssPathSetting)));
         }
 
