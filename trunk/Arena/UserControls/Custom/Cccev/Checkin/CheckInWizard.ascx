@@ -4,6 +4,7 @@
 
 <input type="hidden" name="ihTimeoutError" id="ihTimeoutError" value="<%= AsyncTimeoutErrorMessageSetting %>" />
 <input type="hidden" name="ihFamilyRegistrationPage" id="ihFamilyRegistrationPage" value="<%= FamilyRegistrationPageSetting %>" />
+<input type="hidden" name="ihKioskManagementPage" id="ihKioskManagementPage" value="<%= KioskManagementPageSetting %>" />
 
 <script type="text/javascript" src="UserControls/Custom/Cccev/Checkin/misc/jquery.jscrollpane.js"></script>
 <link rel="stylesheet" type="text/css" media="all" href="UserControls/Custom/Cccev/Checkin/misc/jquery.jscrollpane.css" />

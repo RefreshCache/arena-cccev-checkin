@@ -491,6 +491,16 @@ document.onkeydown = function (e)
             return false;
         }
     }
+
+    // ctrl-shift-m; go to kiosk management page
+    if (keyCode == 13 && isCtrlKey && isShiftKey)
+    {
+        if ($("input[id$='ihKioskManagementPage']").val() != "")
+        {
+            window.location = 'default.aspx?page=' + $("input[id$='ihKioskManagementPage']").val();
+            return false;
+        }
+    }
 }
 
 function CalcAge(secs, num1, num2)
