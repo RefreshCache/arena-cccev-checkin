@@ -216,6 +216,7 @@ h3.checkinText
 	height: 300px;
 	width: 550px;
 	overflow: auto;
+	text-align: left;
 	
 	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
 	scrollbar-face-color: #000000;
@@ -233,6 +234,7 @@ h3.checkinText
 	height: 420px;
 	width: 1024px;
 	overflow: auto;
+	text-align: left;
 	
 	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
 	scrollbar-face-color: #000000;
@@ -249,6 +251,7 @@ h3.checkinText
 	height: 450px;
 	width: 1024px;
 	overflow: auto;
+	text-align: left;
 	
 	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
 	scrollbar-face-color: #000000;
