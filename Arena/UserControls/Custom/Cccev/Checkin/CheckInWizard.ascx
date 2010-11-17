@@ -6,9 +6,6 @@
 <input type="hidden" name="ihFamilyRegistrationPage" id="ihFamilyRegistrationPage" value="<%= FamilyRegistrationPageSetting %>" />
 <input type="hidden" name="ihKioskManagementPage" id="ihKioskManagementPage" value="<%= KioskManagementPageSetting %>" />
 
-<script type="text/javascript" src="UserControls/Custom/Cccev/Checkin/misc/jquery.jscrollpane.js"></script>
-<link rel="stylesheet" type="text/css" media="all" href="UserControls/Custom/Cccev/Checkin/misc/jquery.jscrollpane.css" />
-
 <script type="text/javascript">
     var autoConfirmCancel = '<%= AutoCancelConfirmSetting %>' == 'true';
     var longInterval = parseInt('<%= LongRefreshTimeSetting %>');
@@ -140,14 +137,9 @@
 				                            </div>
 				                        </div>
 				                        <br />
-<<<<<<< .mine
 					                    <asp:Label id="lblMessage" runat="server" CssClass="checkinCaption" />
                                     </div>
 				                    <div class="scrollArea scroll-pane" id="ScrollArea">
-=======
-					                    <asp:Label id="lblMessage" runat="server" CssClass="checkinCaption" /></p>
-				                    <div class="scrollArea scroll-pane" id="ScrollArea">
->>>>>>> .r30
 				                        <asp:datalist CssClass="centeredList" GridLines="None" id="dgFamilies" runat="server" RepeatColumns="1" CellSpacing="5" DataKeyField="FamilyID" 
 				                            OnSelectedIndexChanged="dgFamilies_SelectedIndexChanged" OnItemDataBound="dgFamilies_ItemDataBound">
 						                    <ItemTemplate>
