@@ -68,81 +68,85 @@
                   
             <!-- Begin Views -->
             
-            <asp:Panel ID="pnlInit" runat="server" DefaultButton="btnScan" CssClass="initView">
+            <asp:Panel ID="pnlInit" runat="server" DefaultButton="btnScan" CssClass="initView view">
             <!-- Init State -->
-                <div id="divPanicButton" onclick="reloadBrowser();" style="position: absolute; top: 0; left: 0; height: 100px; width: 100px;"></div>
+                <div id="divPanicButton" onclick="reloadBrowser();"></div>
                 <asp:Panel ID="pnlSwipeCard" runat="server" CssClass="footer">
                     <div id="divLeftFooter" runat="server" class="footerLeft">
-                        <div id="divScanBox" runat="server" visible="false" style="float: left; width: 1px;">
+                        <div id="divScanBox" runat="server" visible="false" class="divScanBox">
                             <asp:textbox id="tbScan" tabIndex="0" runat="server" Font-Size="1pt" BackColor="#222222" ForeColor="#222222" BorderStyle="None" MaxLength="12" Width="1pt" />
                             <asp:Button ID="btnScan" runat="server" OnClick="btnScan_Click" Width="1" />
                         </div>
-                        <div id="divScanNow" runat="server" visible="false" style="float: left;">
+                        <div id="divScanNow" runat="server" visible="false" class="divScanNow">
 	                        <asp:Label ID="lblScanNow" runat="server" />
 	                    </div>
 	                </div>
 	                <div id="divRightFooter" runat="server" class="footerRight">
-                        <asp:Button id="btnSearchByPhone" CssClass="searchButton" style="vertical-align: middle" runat="server" Visible="false" Text="Search By Phone" 
+                        <asp:Button id="btnSearchByPhone" CssClass="searchButton" runat="server" Visible="false" Text="Search By Phone" 
                             OnClick="btnSearchByPhone_Click" OnClientClick="disableButton(this);" />
                     </div>
                     <div id="divWideFooter" runat="server" visible="false" class="footerWide">
                         <p><asp:Label ID="lblWideFooter" runat="server" /></p>
                     </div>
-                    <div id="divTimer" runat="server" visible="false" class="footerWide" style="text-align: left;">
-                            <asp:Label id="lblTimeRemaining" Runat="server" CssClass="footerText" />
+                    <div id="divTimer" runat="server" visible="false" class="footerWide">
+                            <asp:Label id="lblTimeRemaining" Runat="server" CssClass="footerText countdown" />
                         </div>
                 </asp:Panel>
             </asp:Panel>
             
             
-            <asp:Panel ID="pnlFamilySearch" runat="server" DefaultButton="btnFamilySearch">
+            <asp:Panel ID="pnlFamilySearch" runat="server" DefaultButton="btnFamilySearch" CssClass="view">
             <!-- Family Search State -->
                 <asp:Panel ID="pnlPhoneSearch" runat="server" CssClass="container">
-                    <div class="phonePanel" style="text-align: center; padding-top: 10px; margin-left: 40px;">
+                    <div class="phonePanel">
                         <div class="heading">
                             <h3 class="checkinText">Enter Phone #</h3>
                         </div>
-                        <br />
-	                    <table style="border: none;">
+	                    <table class="phone-search">
 		                    <tr>
-			                    <td style="vertical-align: top;">
-				                    <table id="keypad" style="height: 302px; width: 286px; border: none; padding: 2px;" cellspacing="0">
-					                    <tr style="vertical-align: top;">
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '1' )" type="button" value="1" /></td>
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '2' )" type="button" value="2" /></td>
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '3' )" type="button" value="3" /></td>
+			                    <td>
+				                    <table id="keypad">
+					                    <tr>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '1' )" type="button" value="1" /></td>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '2' )" type="button" value="2" /></td>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '3' )" type="button" value="3" /></td>
 					                    </tr>
-					                    <tr style="vertical-align: middle;">
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '4' )" type="button" value="4" /></td>
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '5' )" type="button" value="5" /></td>
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '6' )" type="button" value="6" /></td>
+					                    <tr>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '4' )" type="button" value="4" /></td>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '5' )" type="button" value="5" /></td>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '6' )" type="button" value="6" /></td>
 					                    </tr>
-					                    <tr style="vertical-align: middle;">
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '7' )" type="button" value="7" /></td>
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '8' )" type="button" value="8" /></td>
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '9' )" type="button" value="9" /></td>
+					                    <tr>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '7' )" type="button" value="7" /></td>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '8' )" type="button" value="8" /></td>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '9' )" type="button" value="9" /></td>
 					                    </tr>
-					                    <tr style="vertical-align: middle;">
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClearDigit( )" type="button" value="&lt;"></td>
-						                    <td style="vertical-align: middle; text-align: center;"><input class="phoneButton" onclick="return ClickDigit( '0' )" type="button" value="0" /></td>
-						                    <td style="vertical-align: middle;"><input class="phoneButton" onclick="return ClearAll()" type="button" value="clr" /></td>
+					                    <tr>
+						                    <td><input class="phoneButton" onclick="return ClearDigit( )" type="button" value="&lt;"></td>
+						                    <td><input class="phoneButton" onclick="return ClickDigit( '0' )" type="button" value="0" /></td>
+						                    <td><input class="phoneButton" onclick="return ClearAll()" type="button" value="clr" /></td>
 					                    </tr>
 				                    </table>
-				                    <p>&nbsp;</p>
-				                    <p>&nbsp;</p>
 			                    </td>
-			                    <td style="vertical-align: top; padding-left: 20px">
-				                    <p><div style="width: 100%;">
-				                            <div style="width: 334px; float: left;" onkeypress="javascript:return FireDefaultButton(event,'btnFamilySearch')">
+			                    <td class="search">
+				                    <div class="family-search-controls">
+                                        <div class="controls">
+				                            <div id="phone-textbox" onkeypress="javascript:return FireDefaultButton(event,'btnFamilySearch')">
 				                                <asp:textbox id="txtPhone" runat="server" CssClass="phoneText" Width="334" Height="75" MaxLength="10" />
 				                            </div>
-				                            <div style="width: 212px; float: left; margin-left: 15px;">
+				                            <div id="phone-search-button">
 				                                <asp:button id="btnFamilySearch" runat="server" CssClass="dataButton" Text="Search" OnClick="btnFamilySearch_Click" OnClientClick="disableButton(this);" />
 				                            </div>
 				                        </div>
 				                        <br />
+<<<<<<< .mine
+					                    <asp:Label id="lblMessage" runat="server" CssClass="checkinCaption" />
+                                    </div>
+				                    <div class="scrollArea scroll-pane" id="ScrollArea">
+=======
 					                    <asp:Label id="lblMessage" runat="server" CssClass="checkinCaption" /></p>
 				                    <div class="scrollArea scroll-pane" id="ScrollArea">
+>>>>>>> .r30
 				                        <asp:datalist CssClass="centeredList" GridLines="None" id="dgFamilies" runat="server" RepeatColumns="1" CellSpacing="5" DataKeyField="FamilyID" 
 				                            OnSelectedIndexChanged="dgFamilies_SelectedIndexChanged" OnItemDataBound="dgFamilies_ItemDataBound">
 						                    <ItemTemplate>
@@ -167,9 +171,9 @@
             </asp:Panel>
 
             
-            <asp:Panel ID="pnlSelectFamilyMember" runat="server">
+            <asp:Panel ID="pnlSelectFamilyMember" runat="server" CssClass="view">
             <!-- Select Family Member State -->
-                <div style="text-align: center; width: 100%;">
+                <div class="content">
                     <input type="hidden" id="ihAttendeeIDs" runat="server" />
                     <div class="heading">
                         <p class="checkinCaption"><asp:Label ID="lblFamilyName" runat="server" /></p>
@@ -181,13 +185,13 @@
 		                    OnItemDataBound="dgFamilyMembers_ItemDataBound" ItemStyle-HorizontalAlign="Left" GridLines="None">
                             <ItemStyle HorizontalAlign="Left"></ItemStyle>
 		                    <ItemTemplate>
-		                        <div style="width: 338px;">
-		                            <div style="width: 263px; height: 91px; text-align: left; float: left;">
+		                        <div class="family-member">
+		                            <div class="family-member-button">
 			                            <asp:Button runat="server" ID="btnPerson" Text='<%# DataBinder.Eval(Container, "DataItem.NickName") %>' 
 			                                CommandArgument='<%# DataBinder.Eval(Container, "DataItem.PersonID") %>' CausesValidation="false"  CssClass="dataButton" />
 			                            <input type="hidden" id="ihPersonID" runat="server" value='<%# DataBinder.Eval(Container, "DataItem.PersonID") %>' />
 			                        </div>
-			                        <div style="width: 75px; height: 47px; float: left;"><asp:ImageButton id="imgChecked" runat="server" CssClass="dataStar" ImageUrl="images/empty_checkbox.png" /></div>
+			                        <div class="family-member-checkbox"><asp:ImageButton id="imgChecked" runat="server" CssClass="dataStar" ImageUrl="images/empty_checkbox.png" /></div>
 			                    </div>
 		                    </ItemTemplate>
 	                    </asp:DataList>
@@ -196,8 +200,8 @@
 
                 <div class="footer">
                     <div class="footerLeft">
-                <asp:Button ID="btnSelectFamilyMemberCancel" runat="server" Text="Cancel" 
-		                CssClass="cancelButton" onclick="Cancel_Click"  style="margin-right: 20px;" OnClientClick="disableButton(this);" />
+                        <asp:Button ID="btnSelectFamilyMemberCancel" runat="server" Text="Cancel" 
+		                    CssClass="cancelButton" onclick="Cancel_Click" OnClientClick="disableButton(this);" />
 		            </div>
 		            <div class="footerRight">
                         <asp:Button ID="btnSelectFamilyMemberContinue" runat="server" Text="Next" CssClass="nextButton" 
@@ -218,9 +222,9 @@
             </asp:Panel>
 
             
-            <asp:Panel ID="pnlSelectAbility" runat="server">
+            <asp:Panel ID="pnlSelectAbility" runat="server" CssClass="view">
             <!-- Select Ability State -->
-                <div style="text-align: center;">
+                <div class="content">
                     <div class="heading">
 	                    <h3 class="checkinText"><asp:Label ID="lblPersonName" runat="server" /></h3>
 	                </div>
@@ -244,9 +248,9 @@
             </asp:Panel>
 
             
-            <asp:Panel ID="pnlSelectService" runat="server">
+            <asp:Panel ID="pnlSelectService" runat="server" CssClass="view">
             <!-- Select Service State -->
-                <div style="text-align: center;">
+                <div class="content">
                     <div class="heading">
                         <h3 class="checkinText">Select Services</h3>
                     </div>
@@ -254,7 +258,8 @@
                         OnSelectedIndexChanged="dgEventTimes_SelectedIndexChanged" OnItemDataBound="dgEventTimes_ItemDataBound" ItemStyle-HorizontalAlign="Left">
                         <ItemTemplate>
                             <div class="item">
-                                <asp:Button runat="server" ID="btnService" CommandName="Select" CausesValidation="false" CssClass="dataButton" /><asp:ImageButton id="imgChecked" runat="server" CommandName="Select" CssClass="star" ImageUrl="images/empty_checkbox.png" />
+                                <asp:Button runat="server" ID="btnService" CommandName="Select" CausesValidation="false" CssClass="dataButton" />
+                                <asp:ImageButton id="imgChecked" runat="server" CommandName="Select" CssClass="star" ImageUrl="images/empty_checkbox.png" />
                             </div>
                         </ItemTemplate>
                     </asp:DataList>
@@ -271,9 +276,9 @@
             </asp:Panel>
 
             
-            <asp:Panel ID="pnlConfirm" runat="server">
+            <asp:Panel ID="pnlConfirm" runat="server" CssClass="view">
             <!-- Confirm State -->
-                <div style="text-align: center;">
+                <div class="content">
                     <div class="heading">
                         <h3 class="checkinText">Confirm</h3>
                     </div>
@@ -293,9 +298,9 @@
             </asp:Panel>
 
             
-            <asp:Panel ID="pnlResults" runat="server">
+            <asp:Panel ID="pnlResults" runat="server" CssClass="view">
             <!-- Result State -->
-                <div style="text-align: center;">
+                <div class="content">
                     <div class="heading">
                         <h3 class="checkinText">Thank You!</h3>
                     </div>
@@ -309,7 +314,7 @@
             </asp:Panel>
             
             
-            <asp:Panel ID="pnlBadKiosk" runat="server">
+            <asp:Panel ID="pnlBadKiosk" runat="server" CssClass="view">
             <!-- Bad Kiosk State -->
                 <div class="heading">
                     <h3 class="checkinText">Error!</h3>
