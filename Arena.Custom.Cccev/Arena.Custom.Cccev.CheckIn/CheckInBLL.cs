@@ -4,14 +4,28 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
+<<<<<<< .mine
+* $Revision: 66 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   66   2010-11-15 15:56:11-07:00   JasonO $
+=======
 * $Revision: 65 $ 
 * $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   65   2010-11-04 17:13:52-07:00   nicka $
+>>>>>>> .r29
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
+*  
+<<<<<<< .mine
+*  Revision: 66   Date: 2010-11-15 22:56:11Z   User: JasonO 
+*  Adding membership required on occurrences. 
 *  
 *  Revision: 65   Date: 2010-11-05 00:13:52Z   User: nicka 
 *  Adding the remaining session constants and sorting them. 
 *  
+=======
+*  Revision: 65   Date: 2010-11-05 00:13:52Z   User: nicka 
+*  Adding the remaining session constants and sorting them. 
+*  
+>>>>>>> .r29
 *  Revision: 64   Date: 2010-11-03 22:22:06Z   User: JasonO 
 *  Refactoring to bring more data regarding results of check in process out to 
 *  UI level. 
@@ -134,6 +148,7 @@ using Arena.Organization;
 
 using Arena.Custom.Cccev.CheckIn.Entity;
 using Arena.Custom.Cccev.DataUtils;
+using Arena.SmallGroup;
 
 namespace Arena.Custom.Cccev.CheckIn
 {
@@ -549,25 +564,7 @@ namespace Arena.Custom.Cccev.CheckIn
                 }
 
                 // Checking for tag syncing/membership
-                if (occurrence.OccurrenceType.MembershipRequired)
-                {
-                    // if child is member of a synced profile, add occurrence
-                    if (occurrence.OccurrenceType.SyncWithProfile != Constants.NULL_INT)
-                    {
-                        ProfileMember pm = new ProfileMember(occurrence.OccurrenceType.SyncWithProfile, person.PersonID);
-
-                        if (pm.ProfileID != Constants.NULL_INT)
-                        {
-                            GetClassByLoad(occurrence.StartTime, occurrenceTypeAttribute, occurrence, openClassesByStartTime, matchingClasses);
-                            log.Append(", Required Membership - FOUND MATCH!\n");
-                        }
-                    }
-                }
-				else
-				{
-					GetClassByLoad(occurrence.StartTime, occurrenceTypeAttribute, occurrence, openClassesByStartTime, matchingClasses);
-					log.Append(" - FOUND MATCH!\n");
-				}
+                FilterClassesByMembership(log, person, openClassesByStartTime, occurrence, matchingClasses, occurrenceTypeAttribute);
             }
 
             LogResults(log.ToString());
@@ -591,6 +588,72 @@ namespace Arena.Custom.Cccev.CheckIn
         }
 
         /// <summary>
+        /// Responsible for checking membership based on Tags or Small Groups. Delegates any matches to FilterClassesByLoad method.
+        /// </summary>
+        /// <param name="log">String Builder to log information about filtering process.</param>
+        /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to filter occurrences for</param>
+        /// <param name="openClassesByStartTime">Collection of all open classes</param>
+        /// <param name="occurrence">Occurrence to be matched against</param>
+        /// <param name="matchingClasses">Dictionary to add classes that match criteria</param>
+        /// <param name="occurrenceTypeAttribute">OccurrenceTypeAttribute to determine if load balancing is needed</param>
+        private static void FilterClassesByMembership(StringBuilder log, FamilyMember person, List<Occurrence> openClassesByStartTime, Occurrence occurrence, 
+            Dictionary<DateTime, Occurrence> matchingClasses, OccurrenceTypeAttribute occurrenceTypeAttribute)
+        {
+            bool passesMembershipCheck = false;
+
+            if (occurrence.OccurrenceType.MembershipRequired)
+            {
+                // if child is member of a synced profile, add occurrence
+                if (occurrence.OccurrenceType.SyncWithProfile != Constants.NULL_INT)
+                {
+                    ProfileMember pm = new ProfileMember(occurrence.OccurrenceType.SyncWithProfile, person.PersonID);
+
+                    if (pm.ProfileID != Constants.NULL_INT)
+                    {
+                        passesMembershipCheck = true;
+                        log.Append(", Required Membership");
+                    }
+                }
+            }
+            else if (occurrence.MembershipRequired)
+            {
+                var profileOccurrence = new ProfileOccurrence(occurrence.OccurrenceID);
+                var groupOccurrence = new GroupOccurrence(occurrence.OccurrenceID);
+
+                if (profileOccurrence.ProfileID != Constants.NULL_INT)
+                {
+                    var pm = new ProfileMember(profileOccurrence.ProfileID, person.PersonID);
+
+                    if (pm.ProfileID != Constants.NULL_INT)
+                    {
+                        passesMembershipCheck = true;
+                        log.Append(", Occurrence Membership Required");
+                    }
+                }
+                else if (groupOccurrence.GroupID != Constants.NULL_INT)
+                {
+                    var gm = new GroupMember(groupOccurrence.GroupID, person.PersonID);
+
+                    if (gm.GroupID != Constants.NULL_INT)
+                    {
+                        passesMembershipCheck = true;
+                        log.Append(", Group Membership Required");
+                    }
+                }
+            }
+            else
+            {
+                passesMembershipCheck = true;
+            }
+
+            if (passesMembershipCheck)
+            {
+                FilterClassesByLoad(occurrence.StartTime, occurrenceTypeAttribute, occurrence, openClassesByStartTime, matchingClasses);
+                log.Append(" - FOUND MATCH!\n");
+            }
+        }
+
+        /// <summary>
         /// Responsible for adding the correct class to list of eligible classes. If load balancing is enabled, will attempt to find the best matching
         /// class. This functionality requires Location Specific Occurrences to be set to "true".
         /// </summary>
@@ -599,7 +662,7 @@ namespace Arena.Custom.Cccev.CheckIn
         /// <param name="occurrence">Occurrence to be matched against</param>
         /// <param name="classes">Collection of all open classes</param>
         /// <param name="filteredClasses">Dictionary to add classes that match criteria</param>
-        private static void GetClassByLoad(DateTime startTime, OccurrenceTypeAttribute occurrenceTypeAttribute, 
+        private static void FilterClassesByLoad(DateTime startTime, OccurrenceTypeAttribute occurrenceTypeAttribute, 
             Occurrence occurrence, IEnumerable<Occurrence> classes, IDictionary<DateTime, Occurrence> filteredClasses)
         {
             Occurrence matchingOccurrence = null;
