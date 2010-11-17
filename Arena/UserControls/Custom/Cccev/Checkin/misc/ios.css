@@ -4,10 +4,13 @@
 * Date Created: 11/8/2010
 *
 * $Workfile: ios.css $
-* $Revision: 2 $
-* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/misc/ios.css   2   2010-11-09 11:52:24-07:00   JasonO $
+* $Revision: 3 $
+* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/misc/ios.css   3   2010-11-10 13:49:28-07:00   JasonO $
 *
 * $Log: /trunk/Arena/UserControls/Custom/Cccev/Checkin/misc/ios.css $
+*  
+*  Revision: 3   Date: 2010-11-10 20:49:28Z   User: JasonO 
+*  A few small changes for final testing on iOS and Mac. 
 *  
 *  Revision: 2   Date: 2010-11-09 18:52:24Z   User: JasonO 
 **********************************************************************/
@@ -29,12 +32,6 @@
 {
     text-indent: -10px;
     padding-top: 13px;
-}
-
-.container .footerText
-{
-    display: block;
-    padding-top: 20px;
 }
 
 .container input[type=button].phoneButton
