@@ -5,6 +5,9 @@
 <input type="hidden" name="ihTimeoutError" id="ihTimeoutError" value="<%= AsyncTimeoutErrorMessageSetting %>" />
 <input type="hidden" name="ihFamilyRegistrationPage" id="ihFamilyRegistrationPage" value="<%= FamilyRegistrationPageSetting %>" />
 
+<script type="text/javascript" src="UserControls/Custom/Cccev/Checkin/misc/jquery.jscrollpane.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="UserControls/Custom/Cccev/Checkin/misc/jquery.jscrollpane.css" />
+
 <script type="text/javascript">
     var autoConfirmCancel = '<%= AutoCancelConfirmSetting %>' == 'true';
     var longInterval = parseInt('<%= LongRefreshTimeSetting %>');
@@ -139,7 +142,7 @@
 				                        </div>
 				                        <br />
 					                    <asp:Label id="lblMessage" runat="server" CssClass="checkinCaption" /></p>
-				                    <div class="scrollArea" id="ScrollArea">
+				                    <div class="scrollArea scroll-pane" id="ScrollArea">
 				                        <asp:datalist CssClass="centeredList" GridLines="None" id="dgFamilies" runat="server" RepeatColumns="1" CellSpacing="5" DataKeyField="FamilyID" 
 				                            OnSelectedIndexChanged="dgFamilies_SelectedIndexChanged" OnItemDataBound="dgFamilies_ItemDataBound">
 						                    <ItemTemplate>
@@ -172,7 +175,7 @@
                         <p class="checkinCaption"><asp:Label ID="lblFamilyName" runat="server" /></p>
                         <p class="checkinText">Select All People Attending Today</p>
                     </div>
-                    <div class="resultScrollArea">
+                    <div class="resultScrollArea scroll-pane">
                         <!-- #349 --><asp:DataList id="dgFamilyMembers" runat="server" DataKeyField="PersonID" CssClass="centeredList"
 		                    CellSpacing="5" RepeatColumns="1" BorderColor="Black" BorderWidth="0" Width="353"
 		                    OnItemDataBound="dgFamilyMembers_ItemDataBound" ItemStyle-HorizontalAlign="Left" GridLines="None">
@@ -274,7 +277,7 @@
                     <div class="heading">
                         <h3 class="checkinText">Confirm</h3>
                     </div>
-                    <div class="scrollAreaBig"><asp:PlaceHolder ID="phConfirm" runat="server" /></div>
+                    <div class="scrollAreaBig scroll-pane"><asp:PlaceHolder ID="phConfirm" runat="server" /></div>
                     <div id="divConfirmError" runat="server" visible="false">
                         <p><asp:Label ID="lblConfirmError" runat="server" CssClass="errorCaption" /></p>
                     </div>
@@ -296,7 +299,7 @@
                     <div class="heading">
                         <h3 class="checkinText">Thank You!</h3>
                     </div>
-                    <div class="resultScrollArea"><asp:PlaceHolder ID="phResults" runat="server" /></div>
+                    <div class="resultScrollArea scroll-pane"><asp:PlaceHolder ID="phResults" runat="server" /></div>
                 </div>
                 <div class="footer">
                     <div class="footerRight">
