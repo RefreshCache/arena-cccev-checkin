@@ -282,22 +282,9 @@ h3.checkinText
 .scrollAreaBig, .resultScrollArea
 {
 	height: 420px;
-	width: 1000px;
+	/*width: 1000px !important;*/
 	overflow: auto;
-<<<<<<< .mine
 	text-align: left;
-=======
-	text-align: left;
-	
-	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
-	scrollbar-face-color: #000000;
-	scrollbar-highlight-color: #888888;
-	scrollbar-shadow-color: #000000;
-	scrollbar-3dlight-color: #888888;
-	scrollbar-arrow-color: #CCFFFF;
-	scrollbar-track-color: #999999;
-	scrollbar-darkshadow-color: #000000;
->>>>>>> .r31
 }
 
 .scrollAreaBig
@@ -307,23 +294,9 @@ h3.checkinText
 
 .resultScrollArea
 {
-<<<<<<< .mine
 	height: 420px;
-=======
-	height: 450px;
-	width: 1024px;
 	overflow: auto;
 	text-align: left;
-	
-	/* Scrollbar coloration code.  Not standard.  Will not display in non-Microsoft browsers. */
-	scrollbar-face-color: #000000;
-	scrollbar-highlight-color: #888888;
-	scrollbar-shadow-color: #000000;
-	scrollbar-3dlight-color: #888888;
-	scrollbar-arrow-color: #CCFFFF;
-	scrollbar-track-color: #999999;
-	scrollbar-darkshadow-color: #000000;
->>>>>>> .r31
 }
 
 .family-search-controls
@@ -512,12 +485,11 @@ input.phoneText
 
 .resultTable
 {
-	font-size: 36pt;
+	font-size: 28pt;
 }
 
 table.resultTable
 {
-	width: 950px;
 	border: none;
 	margin: 0px auto;
 }
@@ -530,7 +502,7 @@ td.resultTable
 
 .success
 {
-	font-size: 36pt;
+	font-size: 28pt;
 	color: green;
 }
 
@@ -543,7 +515,7 @@ td.success
 
 .fail
 {
-	font-size: 36pt;
+	font-size: 28pt;
 	color: #FFFFFF;
 }
 
@@ -580,4 +552,9 @@ td.fail
 	background: #000 url(../images/big_roller.gif) no-repeat;
 	background-position: 50%;
 	z-index: 5;
+}
+
+.jspVerticalBar
+{
+    right: 20px;
 }
