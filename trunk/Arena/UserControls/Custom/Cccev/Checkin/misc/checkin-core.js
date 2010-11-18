@@ -489,8 +489,8 @@ document.onkeydown = function (e)
         }
     }
 
-    // ctrl-shift-m; go to kiosk management page
-    if (keyCode == 13 && isCtrlKey && isShiftKey)
+    // ctrl-shift-M; go to kiosk management page
+    if (keyCode == 77 && isCtrlKey && isShiftKey)
     {
         if ($("input[id$='ihKioskManagementPage']").val() != "")
         {
