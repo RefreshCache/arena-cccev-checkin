@@ -179,12 +179,12 @@ h3.checkinText
 
 .confirmText
 {
-	font-size: 36pt;
+	font-size: 28pt;
 }
 
 .classroomText
 {
-	font-size: 36pt;
+	font-size: 28pt;
 	color: #009900;
 	filter: Shadow(Color=#000000, Direction=135, Strength=5);
 }
