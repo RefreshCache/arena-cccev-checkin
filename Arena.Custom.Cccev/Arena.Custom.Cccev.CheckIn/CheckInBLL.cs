@@ -4,28 +4,17 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
-<<<<<<< .mine
 * $Revision: 66 $ 
 * $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   66   2010-11-15 15:56:11-07:00   JasonO $
-=======
-* $Revision: 65 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   65   2010-11-04 17:13:52-07:00   nicka $
->>>>>>> .r29
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
 *  
-<<<<<<< .mine
 *  Revision: 66   Date: 2010-11-15 22:56:11Z   User: JasonO 
 *  Adding membership required on occurrences. 
 *  
 *  Revision: 65   Date: 2010-11-05 00:13:52Z   User: nicka 
 *  Adding the remaining session constants and sorting them. 
 *  
-=======
-*  Revision: 65   Date: 2010-11-05 00:13:52Z   User: nicka 
-*  Adding the remaining session constants and sorting them. 
-*  
->>>>>>> .r29
 *  Revision: 64   Date: 2010-11-03 22:22:06Z   User: JasonO 
 *  Refactoring to bring more data regarding results of check in process out to 
 *  UI level. 
