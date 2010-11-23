@@ -76,8 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CheckInBLL.cs" />
-    <Compile Include="PersonCheckInRequest.cs" />
-    <Compile Include="PersonCheckInResult.cs" />
     <Compile Include="DataLayer\XLocationData.cs" />
     <Compile Include="DataLayer\XOccurrenceAttendanceData.cs" />
     <Compile Include="DataLayer\XOccurrenceData.cs" />
@@ -98,6 +96,8 @@
     <Compile Include="Entity\OccurrenceTypeAttributeCollection.cs" />
     <Compile Include="Entity\OccurrenceTypeAttributeCollectionNonGen.cs" />
     <Compile Include="Entity\RSPrintLabel.cs" />
+    <Compile Include="PersonCheckInRequest.cs" />
+    <Compile Include="PersonCheckInResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
