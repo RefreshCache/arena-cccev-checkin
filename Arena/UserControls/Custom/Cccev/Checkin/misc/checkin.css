@@ -103,6 +103,12 @@ div.footer
     height: 100px;
 }
     
+.divScanBox
+{
+    width: 1px;
+    float: left;
+}
+    
 .footerWide > .countdown
 {
     display: block;
