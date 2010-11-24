@@ -592,12 +592,25 @@ namespace Arena.Custom.Cccev.CheckIn
 
             if (occurrence.OccurrenceType.MembershipRequired)
             {
-                // if child is member of a synced profile, add occurrence
+                //
+                // If the OccurrenceType requires membership then check for
+                // membership in either the synced Profile or the synced Group.
+                //
                 if (occurrence.OccurrenceType.SyncWithProfile != Constants.NULL_INT)
                 {
                     ProfileMember pm = new ProfileMember(occurrence.OccurrenceType.SyncWithProfile, person.PersonID);
 
                     if (pm.ProfileID != Constants.NULL_INT)
+                    {
+                        passesMembershipCheck = true;
+                        log.Append(", Required Membership");
+                    }
+                }
+                else if (occurrence.OccurrenceType.SyncWithGroup != Constants.NULL_INT)
+                {
+                    GroupMember gm = new GroupMember(occurrence.OccurrenceType.SyncWithGroup, person.PersonID);
+
+                    if (gm.GroupID != Constants.NULL_INT)
                     {
                         passesMembershipCheck = true;
                         log.Append(", Required Membership");
@@ -983,7 +996,10 @@ namespace Arena.Custom.Cccev.CheckIn
         }
 
         /// <summary>
-        /// Determines whether or not special needs is required for checkin.
+        /// Determines whether or not the special needs requirement of a person matches the
+        /// occurrence type. A person's special need flag must match the special need flag
+        /// associated with the occurrence type. If either flag is not set, the flag is
+        /// assumed to be "no".
         /// </summary>
         /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to test against</param>
         /// <param name="attribute"><see cref="Arena.Custom.Cccev.CheckIn.Entity.OccurrenceTypeAttribute">OccurrenceTypeAttribute</see> that determines test criteria</param>
@@ -991,19 +1007,20 @@ namespace Arena.Custom.Cccev.CheckIn
         /// <returns>bool based on whether the person attribute matches the OccurrenceTypeAttribute's requirement for special needs</returns>
         private static bool RequiredSpecialNeeds(Person person, OccurrenceTypeAttribute attribute, int attributeID)
         {
+            bool personSpecialNeeds, typeSpecialNeeds;
+
             if (attribute == null)
             {
-                return true;
+                typeSpecialNeeds = false;
             }
-            
-            if (!attribute.IsSpecialNeeds)
+            else
             {
-                return true;
+                typeSpecialNeeds = attribute.IsSpecialNeeds;
             }
             
             PersonAttribute pa = new PersonAttribute(person.PersonID, attributeID);
-            bool specialNeeds = pa.IntValue == 1;  // Arena Framework uses int values in Person Attribute to reflect true/false
-            return (specialNeeds == attribute.IsSpecialNeeds);
+            personSpecialNeeds = pa.IntValue == 1;  // Arena Framework uses int values in Person Attribute to reflect true/false
+            return (personSpecialNeeds == typeSpecialNeeds);
         }
 
         /// <summary>
