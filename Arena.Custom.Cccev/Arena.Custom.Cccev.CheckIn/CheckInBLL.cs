@@ -4,10 +4,13 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
-* $Revision: 66 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   66   2010-11-15 15:56:11-07:00   JasonO $
+* $Revision: 67 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   67   2010-11-24 11:22:50-07:00   JasonO $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
+*  
+*  Revision: 67   Date: 2010-11-24 18:22:50Z   User: JasonO 
+*  Pulling in Daniel's changes. 
 *  
 *  Revision: 66   Date: 2010-11-15 22:56:11Z   User: JasonO 
 *  Adding membership required on occurrences. 
@@ -1007,19 +1010,11 @@ namespace Arena.Custom.Cccev.CheckIn
         /// <returns>bool based on whether the person attribute matches the OccurrenceTypeAttribute's requirement for special needs</returns>
         private static bool RequiredSpecialNeeds(Person person, OccurrenceTypeAttribute attribute, int attributeID)
         {
-            bool personSpecialNeeds, typeSpecialNeeds;
+            bool typeSpecialNeeds = (attribute != null && attribute.IsSpecialNeeds);
 
-            if (attribute == null)
-            {
-                typeSpecialNeeds = false;
-            }
-            else
-            {
-                typeSpecialNeeds = attribute.IsSpecialNeeds;
-            }
-            
             PersonAttribute pa = new PersonAttribute(person.PersonID, attributeID);
-            personSpecialNeeds = pa.IntValue == 1;  // Arena Framework uses int values in Person Attribute to reflect true/false
+            bool personSpecialNeeds = (pa.IntValue == 1);  // Arena Framework uses int values in Person Attribute to reflect true/false
+            
             return (personSpecialNeeds == typeSpecialNeeds);
         }
 
