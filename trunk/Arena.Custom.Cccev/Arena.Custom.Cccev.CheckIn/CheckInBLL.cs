@@ -162,6 +162,7 @@ namespace Arena.Custom.Cccev.CheckIn
 		public const string SESS_STATE = "CCCEV_CHECKIN_STATE";
 		public const string SESS_TOTAL_OCCURRENCES = "ckin_total_occurrences";
 		public const string SESS_UNAVAILABLE_OCCURRENCES = "ckin_unavailable_occurrences";
+		public const string ORG_ALLOWED_INACTIVE_REASONS = "Cccev.AllowedInactiveReasons";
 	}
 
     [Serializable]
@@ -311,9 +312,18 @@ namespace Arena.Custom.Cccev.CheckIn
 
             foreach (Family family in families)
             {
-                if (family.FamilyMembersActive.Count > 0)
+                //
+                // At-least one member of the family must have a valid record status
+                // for the family to be considered active. Once one person is matched
+                // the entire family is added and we move on to the next family.
+                //
+                foreach (FamilyMember fm in family.FamilyMembers)
                 {
-                    activeFamilies.Add(family);
+                    if (RequiredRecordStatus(fm))
+                    {
+                        activeFamilies.Add(family);
+                        break;
+                    }
                 }
             }
 
@@ -331,15 +341,34 @@ namespace Arena.Custom.Cccev.CheckIn
         }
 
         /// <summary>
-        /// Creates a FamilyMemberCollection of provided family's members and any relationships whose type matches one of the array members.
+        /// Creates a FamilyMemberCollection of provided family's members and any relationships
+        /// whose type matches one of the array members. This method also filters people by their
+        /// record status. Active and Pending people are allowed to check-in. Inactive records
+        /// must have an InactiveReason that is included in the org setting Cccev.AllowedInactiveReasons.
         /// </summary>
         /// <param name="family"><see cref="Arena.Core.Family">Family</see> to find relatives for</param>
         /// <param name="relationshipTypeIDs">int array of Relationship ID's</param>
         /// <returns><see cref="Arena.Core.FamilyMemberCollection">FamilyMemberCollection</see> of current family and any relatives</returns>
         public static FamilyMemberCollection GetRelatives(Family family, int[] relationshipTypeIDs)
         {
-            FamilyMemberCollection familyMembers = family.FamilyMembersActive;
+            FamilyMemberCollection familyMembers = new FamilyMemberCollection();
             
+            //
+            // Check each family member to see if they are allowed to check-in.
+            //
+            foreach (FamilyMember fm in family.FamilyMembers)
+            {
+                if (RequiredRecordStatus(fm))
+                {
+                    familyMembers.Add(fm);
+                }
+            }
+
+            //
+            // If there is a list of allowed relationships for check-in, go through and
+            // check all relationships to see if there are any family friends to be
+            // offered up for check-in as well.
+            //
             if (relationshipTypeIDs.Length > 0)
             {
                 Person head = family.FamilyHead;
@@ -350,18 +379,32 @@ namespace Arena.Custom.Cccev.CheckIn
                                                             select r) : new List<Relationship>();
                 relationships = relationships.Concat(spouseRelationships).ToList();
 
+                //
+                // Go through each of the people this family is related to and check if we
+                // are allowed to check them in.
+                //
                 foreach (var rel in relationships)
                 {
+                    //
+                    // Check this relationship against the list of valid relationship types.
+                    //
                     foreach (int i in relationshipTypeIDs)
                     {
+                        //
+                        // Relationship must be one selected by the user and make sure we don't
+                        // add the same person twice.
+                        //
                         if (rel.RelationshipTypeId != i || familyMembers.FindByID(rel.RelatedPersonId) != null)
                         {
                             continue;
                         }
 
+                        //
+                        // Make sure the record status for this person is valid and if it is
+                        // add them to the list of people to offer up for check-in.
+                        //
                         FamilyMember relative = new FamilyMember(rel.RelatedPersonId);
-
-                        if (relative.RecordStatus != Enums.RecordStatus.Inactive)
+                        if (RequiredRecordStatus(relative))
                         {
                             familyMembers.Add(relative);
                         }
@@ -996,6 +1039,42 @@ namespace Arena.Custom.Cccev.CheckIn
             }
             
             return true;
+        }
+
+        /// <summary>
+        /// Determines if the person has the required record status for check-in.
+        /// </summary>
+        /// <param name="person">The person to check the record status of.</param>
+        /// <returns>true if the person can be checked-in or false if they cannot.</returns>
+        private static bool RequiredRecordStatus(Person person)
+        {
+            //
+            // We allow Active and Pending records strait away.
+            //
+            if (person.RecordStatus == Enums.RecordStatus.Active || person.RecordStatus == Enums.RecordStatus.Pending)
+            {
+                return true;
+            }
+            else if (person.RecordStatus == Enums.RecordStatus.Inactive)
+            {
+                string allowedReasonsSetting = ArenaContext.Current.Organization.Settings[CheckInConstants.ORG_ALLOWED_INACTIVE_REASONS];
+
+                //
+                // If the record is inactive the inactive reason must be one of the
+                // allowed lookup IDs listed in the org setting.
+                //
+                if (!String.IsNullOrEmpty(allowedReasonsSetting))
+                {
+                    IEnumerable<int> allowedReasons = allowedReasonsSetting.SplitAndConvertTo<int>(new [] { ',' }, Convert.ToInt32);
+
+                    if (allowedReasons.Contains(person.InactiveReason.LookupID))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
