@@ -1,5 +1,5 @@
 <ArenaPackage version="2009.2.100.1401">
-  <Readme>v1.3.1 - Works with Arena 2010.1
+  <Readme>v1.3.0 - Works with Arena 2010.1 and 2010.2
        - Added a "maximum" phone length setting and changed behavior to only auto search if person enters max digits.
        - Added a "minimum" age and grade module setting to filter family members.
        - New scroll-bar mechanism which works great on various touch screens (iPad, etc.)
@@ -38,7 +38,37 @@ v1.1.0 - Added support for Attendance Type "Membership Required for Check-In".
     <Module temp_module_id="-5" module_url="UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx" module_name="Checkin Wizard" module_desc="A custom, self-service, check-in system by Central Christian Church (CCCEV) and High Desert Church (HDC)." allows_child_modules="0" image_path="" _source="Arena\UserControls\Custom\Cccev\Checkin\CheckInWizard.ascx" _source_image="" _system="0" />
     <Module temp_module_id="-6" module_url="UserControls/Custom/Cccev/Checkin/KioskAdmin.ascx" module_name="Kiosk Management" module_desc="A simple module to help quickly &quot;register&quot; a kiosk with the Arena Kiosk list." allows_child_modules="0" image_path="" _source="Arena\UserControls\Custom\Cccev\Checkin\KioskAdmin.ascx" _source_image="" _system="0" />
   </Modules>
-  <Pages />
+  <Pages>
+    <Page temp_page_id="-1" page_order="2147483647" display_in_nav="1" page_name="Childrens Check-in" page_desc="The CheckInWizard - a web based check-in system by CCCEV and HDC." page_settings="NavBarIcon=user1_monitor.png;NavBarHoverIcon=user1_monitor.png" require_ssl="0" guid="4639AEA0-4386-4619-A248-59044FBA1B79" system_flag="0" friendly_url="" validate_request="1" temp_parent_page_id="0">
+      <ModuleInstance temp_module_instance_id="-1" module_title="Childrens CheckIn Wizard" show_title="0" template_frame_name="Main" template_frame_order="0" module_details="" system_flag="0" mandatory="0" movable="0" description="" image_path="" temp_module_id="-5" temp_page_id="-1" module_settings="AllowScanByPhone=true;AutoCancelConfirm=true;BackgroundImagePath=UserControls/Custom/Cccev/Checkin/images/backgrounds/background_new.jpg;BadKioskText=This kiosk has not been registered.;EventIsClosedMessage=This event has been closed.;GetAttendeeAbilities=true;IgnoreCheckInStart=true;LookAheadHours=2;LookAheadMinutes=15;MaximumAge=13;NoEligibleCheckInPeople=There are no young children associated with your key tag. Visit the Children's Headquarters.;NoOccurrenceMessage=No classes are available at this time.;PhoneLength=10;PrintProvider=9622;ScanNowMessage=Scan Card &amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^ -or-;SearchByPhoneMessage=Search By Phone" module_instance_guid="f7068637-42db-42e2-b66d-43e75439c137" temp_page_or_template_id="-1" page_instance="1">
+        <Setting name="AbilityLevelAttributeID" value="" type_id="17" />
+        <Setting name="AbilityLevelLookupTypeID" value="" type_id="17" />
+        <Setting name="AllowScanByPhone" value="true" type_id="4" />
+        <Setting name="AutoCancelConfirm" value="true" type_id="4" />
+        <Setting name="BackgroundImagePath" value="UserControls/Custom/Cccev/Checkin/images/backgrounds/background_new.jpg" type_id="1" />
+        <Setting name="BadKioskText" value="This kiosk has not been registered." type_id="1" />
+        <Setting name="EventIsClosedMessage" value="This event has been closed." type_id="1" />
+        <Setting name="GetAttendeeAbilities" value="true" type_id="4" />
+        <Setting name="IgnoreCheckInStart" value="true" type_id="4" />
+        <Setting name="LookAheadHours" value="2" type_id="2" />
+        <Setting name="LookAheadMinutes" value="15" type_id="2" />
+        <Setting name="MaximumAge" value="13" type_id="2" />
+        <Setting name="NoEligibleCheckInPeople" value="There are no young children associated with your key tag. Visit the Children's Headquarters." type_id="1" />
+        <Setting name="NoOccurrenceMessage" value="No classes are available at this time." type_id="1" />
+        <Setting name="PhoneLength" value="10" type_id="2" />
+        <Setting name="PrintProvider" value="9622" type_id="10" guid="e81af83a-10f5-417f-ab76-220cebb927cc" />
+        <Setting name="RelationshipTypeIDs" value="" type_id="17" />
+        <Setting name="ScanNowMessage" value="Scan Card &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; -or-" type_id="1" />
+        <Setting name="SearchByPhoneMessage" value="Search By Phone" type_id="1" />
+        <Setting name="SpecialNeedsAttributeID" value="" type_id="17" />
+      </ModuleInstance>
+      <Page temp_page_id="-2" page_order="2147483647" display_in_nav="0" page_name="Kiosk Admin" page_desc="Management page to help with the setup of new kiosks." page_settings="" require_ssl="0" guid="82549bb1-8218-4a31-8c77-230b6343a91a" system_flag="0" friendly_url="" validate_request="1" temp_parent_page_id="-1">
+        <ModuleInstance temp_module_instance_id="-2" module_title="Kiosk Management" show_title="0" template_frame_name="Main" template_frame_order="0" module_details="" system_flag="0" mandatory="0" movable="0" description="" image_path="" temp_module_id="-6" temp_page_id="-2" module_settings="" module_instance_guid="496d36a5-2d4d-4ab3-87cd-0c33e8ad413f" temp_page_or_template_id="-2" page_instance="1">
+          <Setting name="ReturnUrl" value="" type_id="1" />
+        </ModuleInstance>
+      </Page>
+    </Page>
+  </Pages>
   <Files>
     <File path="bin/Arena.Custom.Cccev.DataUtils.dll" _source="DLLs\Arena.Custom.Cccev.DataUtils.dll" />
     <File path="bin/Arena.Custom.Cccev.FrameworkUtils.dll" _source="DLLs\Arena.Custom.Cccev.FrameworkUtils.dll" />
@@ -53,7 +83,6 @@ v1.1.0 - Added support for Attendance Type "Membership Required for Check-In".
     <File path="UserControls/Custom/Cccev/Checkin/images/checkin_bg.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\checkin_bg.png" />
     <File path="UserControls/Custom/Cccev/Checkin/images/checkmark.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\checkmark.png" />
     <File path="UserControls/Custom/Cccev/Checkin/images/ClassLocationSummary.jpg" _source="Arena\UserControls\Custom\Cccev\Checkin\images\ClassLocationSummary.jpg" />
-    <File path="UserControls/Custom/Cccev/Checkin/images/confidential.gif" _source="Arena\UserControls\Custom\Cccev\Checkin\images\confidential.gif" />
     <File path="UserControls/Custom/Cccev/Checkin/images/data_gear.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\data_gear.png" />
     <File path="UserControls/Custom/Cccev/Checkin/images/default_checkin_splash.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\default_checkin_splash.png" />
     <File path="UserControls/Custom/Cccev/Checkin/images/empty_checkbox.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\empty_checkbox.png" />
@@ -93,7 +122,7 @@ v1.1.0 - Added support for Attendance Type "Membership Required for Check-In".
     <Version>1.0.0</Version>
     <Synopsis>Super fast, web based, self-serve, custom check-in system</Synopsis>
     <Description>The Check-in Wizard is a self-serve "childrens check-in" kiosk ArenaChMS module used to by parents to check-in their kids into Sunday school. This module uses the underlying Arena check-in framework (Attendance Types, Occurrences, etc.) and some custom code that provides extended attributes for Attendance Types. Note: This is the live, production Children's check-in system at Central Christian Church and High Desert Church.</Description>
-    <ArenaVersion MinVersion="2009.2.400" MaxVersion="2010.1.0" Version="0.0.0" />
+    <ArenaVersion MinVersion="2009.2.400" MaxVersion="0.0.0" Version="0.0.0" />
   </Info>
   <Migration _source="" />
 </ArenaPackage>
