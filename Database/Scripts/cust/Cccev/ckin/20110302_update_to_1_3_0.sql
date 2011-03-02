@@ -26,6 +26,8 @@ SET @Today = GetDate()
 DECLARE @CccevCheckinWizardCategoryGuid uniqueidentifier
 SET @CccevCheckinWizardCategoryGuid = 'f0da7805-8590-406f-83c0-f7f074d14c1e'
 
+DECLARE @CccevCheckinWizardCategoryLookupID int
+SELECT @CccevCheckinWizardCategoryLookupID = lookup_id FROM core_lookup WHERE guid = @CccevCheckinWizardCategoryGuid
 
 --------------------------------------------------------------------------
 -- New Organization Settings for 1.3.0
@@ -33,7 +35,7 @@ SET @CccevCheckinWizardCategoryGuid = 'f0da7805-8590-406f-83c0-f7f074d14c1e'
 
 IF NOT EXISTS (SELECT * FROM orgn_organization_setting WHERE [Key] = 'Cccev.AllowedInactiveReasons')
 BEGIN
-	INSERT INTO [dbo].[orgn_organization_setting] ([organization_id], [Key], [Value], [date_created], [date_modified], [created_by], [modified_by], [Descr], [system_flag], [category_luid], [read_only]) VALUES (@OrganizationID, 'Cccev.AllowedInactiveReasons', '', @Today, @Today, @CurrentUser, @CurrentUser, 'Comma delimted list of LookupIDs (inactive reasons).  If set, will allow individuals whose record status is marked as inactive to check-in using the Check-in Wizard.', 0, @CccevCheckinWizardCategoryGuid, 0)
+	INSERT INTO [dbo].[orgn_organization_setting] ([organization_id], [Key], [Value], [date_created], [date_modified], [created_by], [modified_by], [Descr], [system_flag], [category_luid], [read_only]) VALUES (@OrganizationID, 'Cccev.AllowedInactiveReasons', '', @Today, @Today, @CurrentUser, @CurrentUser, 'Comma delimted list of LookupIDs (inactive reasons).  If set, will allow individuals whose record status is marked as inactive to check-in using the Check-in Wizard.', 0, @CccevCheckinWizardCategoryLookupID, 0)
 END
 
 
