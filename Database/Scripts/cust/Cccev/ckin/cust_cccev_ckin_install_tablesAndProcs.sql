@@ -513,3 +513,69 @@ UPDATE [cust_cccev_ckin_security_code]
 	
 GO
 --------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- v1.3.0 Add two functions that are used by the sample RS label reports -------
+--------------------------------------------------------------------------------
+
+-- #1 cust_hdc_funct_calc_age
+-----------------------------
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[cust_hdc_funct_calc_age]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+	DROP FUNCTION [dbo].[cust_hdc_funct_calc_age]
+GO
+
+CREATE FUNCTION [dbo].[cust_hdc_funct_calc_age](@birthdate DATETIME, @mcutoff INT, @ycutoff INT)
+RETURNS VARCHAR(10)
+AS
+BEGIN
+
+DECLARE @years INT, @months INT, @decades INT
+
+IF @birthdate > GETDATE()
+    SET @months = 0
+ELSE
+    SET @months = (DATEDIFF(month,@birthdate,GETDATE()) - CASE WHEN DAY(GETDATE()) < DAY(@birthdate) THEN 1 ELSE 0 END)
+
+SET @years = @months / 12
+SET @decades = ROUND(@years/10,0)*10
+
+RETURN CASE
+    WHEN @years < @mcutoff THEN CAST(@months % (@mcutoff * 12) AS VARCHAR) + CASE WHEN @months = 1 THEN ' month' ELSE ' months' END
+    WHEN @years < @ycutoff THEN CAST(@years AS VARCHAR) + CASE WHEN @years = 1 THEN ' year' ELSE ' years' END
+    WHEN @years < 100 THEN CAST(@decades AS VARCHAR) + '''s'
+    ELSE ''
+	END
+END
+
+GO
+
+-- #2 cust_hdc_funct_parent_names
+---------------------------------
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[cust_hdc_funct_parent_names]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+	DROP FUNCTION [dbo].[cust_hdc_funct_parent_names]
+GO
+
+CREATE FUNCTION [dbo].[cust_hdc_funct_parent_names] (@PersonID int)
+	RETURNS varchar(2000)
+AS
+BEGIN
+	DECLARE @ParentNames varchar(2000)
+	SET @ParentNames = ''
+	
+	DECLARE @AdultRoleID int
+	SET @AdultRoleID = dbo.core_funct_luid_familyAdult()
+
+	SELECT @ParentNames = 
+		RTRIM(ISNULL(P.nick_name,'')) + ' ' + CASE @ParentNames WHEN '' THEN RTRIM(ISNULL(P.last_name,'')) ELSE 'and ' END +
+		@ParentNames
+	FROM core_family_member FM
+	INNER JOIN core_family_member FM2 ON FM2.family_id = FM.family_id
+	INNER JOIN core_person P ON P.person_id = FM2.person_id
+	WHERE FM.person_id = @PersonID AND FM2.role_luid = @AdultRoleID
+	ORDER BY P.gender DESC
+
+	RETURN @ParentNames
+END
+GO
+
+--------------------------------------------------------------------------------
