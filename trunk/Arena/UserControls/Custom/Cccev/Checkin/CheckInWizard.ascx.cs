@@ -228,8 +228,9 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
         [PageSetting("Family Registration Page", "The location of the family registration wizard you wish to use. Activated when CTRL-SHIFT-R is pressed.", false)]
         public string FamilyRegistrationPageSetting { get { return Setting("FamilyRegistrationPage", "", false); } }
 
-		[PageSetting( "Kiosk Management Page", "The location of the kiosk management page. Activated when CTRL-SHIFT-M is pressed.", false )]
-		public string KioskManagementPageSetting { get { return Setting( "KioskManagementPage", "", false ); } }
+        [SmartPageSetting("Kiosk Management Page", "The location of the kiosk management page. Activated when CTRL-SHIFT-M is pressed.", "UserControls/Custom/Cccev/Checkin/KioskAdmin.ascx", RelatedModuleLocation.Beneath, false)]
+        public string KioskManagementPageSetting { get { return _KioskManagementPageSetting; } set { _KioskManagementPageSetting = value; } }
+        protected string _KioskManagementPageSetting;
 
         [BooleanSetting("Ignore Check-In Start", "If set to 'true', the system will allow people to check into future services (ie: services for which the Check-In Start Time has not yet occurred).", false, true)]
         public string IgnoreCheckInStartSetting { get { return Setting("IgnoreCheckInStart", "true", false); } }

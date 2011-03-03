@@ -4,7 +4,7 @@
 
 <input type="hidden" name="ihTimeoutError" id="ihTimeoutError" value="<%= AsyncTimeoutErrorMessageSetting %>" />
 <input type="hidden" name="ihFamilyRegistrationPage" id="ihFamilyRegistrationPage" value="<%= FamilyRegistrationPageSetting %>" />
-<input type="hidden" name="ihKioskManagementPage" id="ihKioskManagementPage" value="<%= KioskManagementPageSetting %>" />
+<input type="hidden" name="ihKioskManagementPage" id="ihKioskManagementPage" value="<%= _KioskManagementPageSetting %>" />
 
 <script type="text/javascript">
     var autoConfirmCancel = '<%= AutoCancelConfirmSetting %>' == 'true';
