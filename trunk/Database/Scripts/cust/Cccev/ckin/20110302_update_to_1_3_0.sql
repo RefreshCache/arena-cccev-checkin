@@ -38,7 +38,13 @@ BEGIN
 	INSERT INTO [dbo].[orgn_organization_setting] ([organization_id], [Key], [Value], [date_created], [date_modified], [created_by], [modified_by], [Descr], [system_flag], [category_luid], [read_only]) VALUES (@OrganizationID, 'Cccev.AllowedInactiveReasons', '', @Today, @Today, @CurrentUser, @CurrentUser, 'Comma delimted list of LookupIDs (inactive reasons).  If set, will allow individuals whose record status is marked as inactive to check-in using the Check-in Wizard.', 0, @CccevCheckinWizardCategoryLookupID, 0)
 END
 
-
+--------------------------------------------------------------------------
+-- Remove old org setting no longer used
+--------------------------------------------------------------------------
+IF EXISTS (SELECT * FROM orgn_organization_setting WHERE [Key] = 'Cccev.PrintLabelDefaultSystemID')
+BEGIN
+	DELETE FROM [dbo].[orgn_organization_setting] WHERE [Key] = 'Cccev.PrintLabelDefaultSystemID'
+END
 
 COMMIT
 GO
