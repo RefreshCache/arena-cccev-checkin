@@ -6,8 +6,8 @@
 * Date Created:	1/12/2009 10:16 AM
 *
 * $Workfile: cust_cccev_ckin_install_data.sql $
-* $Revision: 12 $ 
-* $Header: /trunk/Database/Scripts/cust/Cccev/ckin/cust_cccev_ckin_install_data.sql   12   2009-11-25 13:27:15-07:00   nicka $
+* $Revision: 13' $ 
+* $Header: /trunk/Database/Scripts/cust/Cccev/ckin/cust_cccev_ckin_install_data.sql   13'   2011-03-02 22:27:15-07:00   nicka $
 * 
 * $Log: /trunk/Database/Scripts/cust/Cccev/ckin/cust_cccev_ckin_install_data.sql $
 *  
@@ -260,7 +260,7 @@ DECLARE @CheckInPrintLabelSystemLookupTypeID int
 SELECT @CheckInPrintLabelSystemLookupTypeID = lookup_type_id FROM core_lookup_type WHERE @CheckInPrintLabelSystemGuid = guid
 
 --------------------------------------------------------------------------
--- Add the default Print Label provider and other additional providers
+-- Add the default providers
 --------------------------------------------------------------------------
 
 IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @DefaultCheckInPrintLabelGuid )
@@ -268,9 +268,6 @@ BEGIN
 INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
      VALUES (@DefaultCheckInPrintLabelGuid, @CheckInPrintLabelSystemLookupTypeID, 'Cccev Print Label Provider', '', 'Arena.Custom.Cccev.CheckIn', '', '', '', '', '', 'Arena.Custom.Cccev.CheckIn.Entity.CccevPrintLabel', 1, 1, 0, NULL)
 END
--- get the ID
-DECLARE @DefaultCheckInPrintLabelLookupID int
-SELECT @DefaultCheckInPrintLabelLookupID = lookup_id FROM core_lookup WHERE @DefaultCheckInPrintLabelGuid = guid
 
 IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @RSCheckInPrintLabelGuid )
 BEGIN
@@ -604,14 +601,8 @@ END
 
 --------------------------------------------------------------------------
 -- Organization Settings for Check-in Wizard (Category)
--- Set the default Label Provider
 -- Set the default Security Code Provider
 --------------------------------------------------------------------------
-
-IF NOT EXISTS (SELECT * FROM orgn_organization_setting WHERE [Key] = 'Cccev.PrintLabelDefaultSystemID')
-BEGIN
-	INSERT INTO [dbo].[orgn_organization_setting] ([organization_id], [Key], [Value], [date_created], [date_modified], [created_by], [modified_by], [Descr], [system_flag], [category_luid], [read_only]) VALUES (@OrganizationID, 'Cccev.PrintLabelDefaultSystemID', CAST( @DefaultCheckInPrintLabelLookupID AS VARCHAR), @Today, @Today, @CurrentUser, @CurrentUser, 'Lookup ID that points to Print Label provider class.', 0, @CccevCheckinWizardCategoryLookupID, 0)
-END
 
 IF NOT EXISTS (SELECT * FROM orgn_organization_setting WHERE [Key] = 'Cccev.SecurityCodeDefaultSystemID')
 BEGIN
