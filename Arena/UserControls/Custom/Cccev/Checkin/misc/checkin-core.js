@@ -29,7 +29,7 @@ function initPage()
 
     $('.scroll-pane').jScrollPane({
         showArrows : true,
-        arrowButtonSpeed : 15,
+        arrowButtonSpeed : 7,
         arrowRepeatFreq : 250,
         hideFocus : true
     });
@@ -160,14 +160,15 @@ function getState()
     }
 }
 
-function setupViewInfo(stateName, intervalLength, shouldShowLoadingImage)
-{
+function setupViewInfo(stateName, intervalLength, shouldShowLoadingImage) {
     state = stateName;
     interval = intervalLength;
 
-    if (shouldShowLoadingImage === true)
-    {
+    if (shouldShowLoadingImage === true) {
         $("#upProgress").removeClass("ajaxProgress").addClass("ajaxLargeProgress");
+    }
+    else {
+        $("#upProgress").removeClass("ajaxLargeProgress").addClass("ajaxProgress");
     }
 }
 
