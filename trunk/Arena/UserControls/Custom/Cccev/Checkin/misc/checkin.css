@@ -100,7 +100,7 @@ div.footer
 .divScanNow
 {
     float: left;
-    height: 100px;
+    /*height: 100px;*/
 }
     
 .divScanBox
