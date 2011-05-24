@@ -1,9 +1,13 @@
 /**
 * $Workfile: CheckinLabel.cs $
-* $Revision: 14 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/CheckinLabel.cs   14   2009-11-12 16:33:05-07:00   JasonO $
+* $Revision: 15 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/CheckinLabel.cs   15   2011-02-14 15:31:51-07:00   nicka $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/Entity/CheckinLabel.cs $
+*  
+*  Revision: 15   Date: 2011-02-14 22:31:51Z   User: nicka 
+*  Added a black "border" around the black health notes box to make it 'pop' a 
+*  bit more. 
 *  
 *  Revision: 14   Date: 2009-11-12 23:33:05Z   User: JasonO 
 *  Making room number configurable on plabel's name tag. 
@@ -830,7 +834,11 @@ namespace Arena.Custom.Cccev.CheckIn
 				ypos = ypos + 30;  //set y pos of rectangle
 				//Set color to black
 				br.Color = Color.Black;
-				g.FillRectangle( br, xpos, ypos, allergybarwidth, allergybarheight );
+				g.FillRectangle( br, xpos-2, ypos-2, allergybarwidth+4, allergybarheight+4 );  // black
+				br.Color = Color.White;
+				g.FillRectangle( br, xpos-1, ypos-1, allergybarwidth+2, allergybarheight+2 );  // white
+				br.Color = Color.Black;
+				g.FillRectangle( br, xpos, ypos, allergybarwidth, allergybarheight );  // black
 
 				//draw white text over rectangle
 				Rf.X = (int)( squishyness / 2 ) + 10;
