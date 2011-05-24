@@ -4,10 +4,13 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
-* $Revision: 67 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   67   2010-11-24 11:22:50-07:00   JasonO $
+* $Revision: 68 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   68   2010-11-30 11:05:56-07:00   JasonO $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
+*  
+*  Revision: 68   Date: 2010-11-30 18:05:56Z   User: JasonO 
+*  Implementing R# recommendations to RequiredSpecialNeeds. 
 *  
 *  Revision: 67   Date: 2010-11-24 18:22:50Z   User: JasonO 
 *  Pulling in Daniel's changes. 

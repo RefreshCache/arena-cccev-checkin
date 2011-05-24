@@ -96,6 +96,7 @@
     <Compile Include="Entity\OccurrenceTypeAttributeCollection.cs" />
     <Compile Include="Entity\OccurrenceTypeAttributeCollectionNonGen.cs" />
     <Compile Include="Entity\RSPrintLabel.cs" />
+    <Compile Include="Entity\NullPrintLabel.cs" />
     <Compile Include="PersonCheckInRequest.cs" />
     <Compile Include="PersonCheckInResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
