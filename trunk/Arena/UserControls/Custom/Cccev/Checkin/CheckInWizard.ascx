@@ -27,32 +27,34 @@
     var messageLabel;
     var maxDigits = parseInt('<%= PhoneLengthMaxSetting %>');
 
-    function setupCountdown()
-    {
+    function setupCountdown() {
         var lblTimer = $get('<%= lblTimeRemaining.ClientID %>');
 
-        if (lblTimer)
-        {
+        if (lblTimer) {
             StartTime = $get('<%= ihStartTime.ClientID %>').value;
             NowTime = $get('<%= ihNowTime.ClientID %>').value;
 
-            if ($get('CountDown').innerHTML == '')
-            {
+            if ($get('CountDown').innerHTML == '') {
                 StartTimer('<%= CurrentPortalPage.PortalPageID %>');
             }
         }
     }
 
-    $(function ()
-    {
-        if (window.Touch)
-        {
+    $(function () {
+        if (window.Touch) {
             var meta = $('<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;" />');
             var js = $('<script type="text/javascript" src="UserControls/Custom/Cccev/CheckIn/misc/ios.js"></' + 'script>');
             var css = $('<link type="text/css" rel="stylesheet" href="UserControls/Custom/Cccev/CheckIn/misc/ios.css" />');
+            var appCapable = $('<meta name="apple-mobile-web-app-capable" content="yes" />');
+            var icon = $('<link rel="apple-touch-icon" href="usercontrols/custom/cccev/checkin/images/retina-icon.png" />');
+            var status = $('<meta name="apple-mobile-web-app-status-bar-style" content="black" />');
+
             $('head').append(meta)
                 .append(js)
-                .append(css);
+                .append(css)
+                .append(appCapable)
+                .append(icon)
+                .append(status);
         }
     });
 </script>
