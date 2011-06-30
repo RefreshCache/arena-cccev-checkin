@@ -34,7 +34,11 @@ namespace Arena.Custom.Cccev.CheckIn.Entity
             Kiosk kiosk = new Kiosk() { System = system };
             var jobs = kiosk.GetPrintJobs(attendance);
             ReportPrinter printer = new ReportPrinter();
-            printer.PrintReports(jobs);
+
+            foreach (ReportPrintJob job in jobs)
+            {
+                printer.PrintReport(job.PrinterName, job.ReportPath, job.Copies, job.Landscape, job.Parameters, job.PrinterName);
+            }
         }
     }
 }
