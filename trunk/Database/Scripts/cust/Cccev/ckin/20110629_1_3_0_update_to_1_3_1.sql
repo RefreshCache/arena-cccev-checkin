@@ -11,6 +11,19 @@
 **********************************************************************/
 
 --------------------------------------------------------------------------
+-- Add missing is_room_balancing if not there while adding 'false' for
+-- all existing records in the table.
+--------------------------------------------------------------------------
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'cust_cccev_ckin_occurrence_type_attribute' AND COLUMN_NAME = 'is_room_balancing')
+BEGIN
+   ALTER TABLE cust_cccev_ckin_occurrence_type_attribute ADD is_room_balancing BIT NOT NULL
+   CONSTRAINT [DF_cust_cccev_ckin_occurrence_type_attribute_is_room_balancing] DEFAULT ((0)) WITH VALUES 
+END
+
+
+--------------------------------------------------------------------------
 -- Correction for missing is_room_balancing parameter
 --------------------------------------------------------------------------
 
