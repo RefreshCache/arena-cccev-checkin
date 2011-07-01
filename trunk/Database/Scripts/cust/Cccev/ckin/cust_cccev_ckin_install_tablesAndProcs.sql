@@ -431,6 +431,7 @@ create Proc cust_cccev_ckin_sp_save_occurrenceTypeAttribute
 @OccurrenceTypeAttributeId int,
 @OccurrenceTypeId int,
 @IsSpecialNeeds bit,
+@IsRoomBalancing bit,
 @LastNameStartingLetter varchar(1),
 @LastNameEndingLetter varchar(1),
 @UserId varchar(50),
@@ -455,6 +456,7 @@ AS
 			,[modified_by]
 			,[occurrence_type_id]
 			,[is_special_needs]
+			,[is_room_balancing]
 			,[last_name_starting_letter]
 			,[last_name_ending_letter]
 		)
@@ -466,6 +468,7 @@ AS
 			,@UserID
 			,@OccurrenceTypeId
 			,@IsSpecialNeeds
+			,@IsRoomBalancing
 			,@LastNameStartingLetter
 			,@LastNameEndingLetter
 		)
@@ -481,6 +484,7 @@ AS
 			,[modified_by] = @UserID
 			,[occurrence_type_id] = @OccurrenceTypeId
 			,[is_special_needs] = @IsSpecialNeeds
+			,[is_room_balancing] = @IsRoomBalancing
 			,[last_name_starting_letter] = @LastNameStartingLetter
 			,[last_name_ending_letter] = @LastNameEndingLetter
 		WHERE [occurrence_type_attribute_id] = @OccurrenceTypeAttributeId
