@@ -619,6 +619,15 @@ BEGIN
 END
 
 --------------------------------------------------------------------------
+-- 1.3.1 define the template if not already defined
+--------------------------------------------------------------------------
+
+IF NOT EXISTS (SELECT * FROM port_template WHERE [template_url] like '%UserControls/Custom/Cccev/Checkin/misc/BlankTemplate.ascx')
+BEGIN
+	INSERT INTO [dbo].[port_template] ([date_created],[date_modified],[created_by],[modified_by],[template_name],[template_desc],[template_url]) VALUES (@Today, @Today, @CurrentUser, @CurrentUser, 'Check-in Wizard Blank Template', 'For use with the Check-in Wizard module', '~/UserControls/Custom/Cccev/Checkin/misc/BlankTemplate.ascx')
+END
+           
+--------------------------------------------------------------------------
 -- Run SP to setup security codes for the default Security Code provider
 --------------------------------------------------------------------------
 
