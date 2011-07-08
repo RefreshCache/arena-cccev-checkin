@@ -120,3 +120,27 @@ AS
 	END
 
 GO
+
+
+--------------------------------------------------------------------------
+-- Install the Null Print Provider
+--------------------------------------------------------------------------
+
+-- Print Label Provider Lookup Type
+DECLARE @CheckInPrintLabelSystemGuid uniqueidentifier
+SET @CheckInPrintLabelSystemGuid = '420221aa-8c79-435b-b884-fa3f6855d0d1'
+
+-- GUID for the Null Print Label provider
+DECLARE @NULLCheckInPrintLabelGuid uniqueidentifier
+SET @NULLCheckInPrintLabelGuid = '5240e0f9-265d-4c2c-bbff-8cc1c3d302a8'
+
+-- Determine the LookupTypeID for the Print Label Provider Lookup
+DECLARE @CheckInPrintLabelSystemLookupTypeID int
+SELECT @CheckInPrintLabelSystemLookupTypeID = lookup_type_id FROM core_lookup_type WHERE @CheckInPrintLabelSystemGuid = guid
+
+IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @NULLCheckInPrintLabelGuid )
+BEGIN
+INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
+     VALUES (@NULLCheckInPrintLabelGuid, @CheckInPrintLabelSystemLookupTypeID, 'Cccev Null Print Label Provider', '', 'Arena.Custom.Cccev.CheckIn', '', '', '', '', '', 'Arena.Custom.Cccev.CheckIn.Entity.NullPrintLabel', 1, 1, 0, NULL)
+END
+
