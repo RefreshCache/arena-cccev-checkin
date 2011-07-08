@@ -124,6 +124,10 @@ SET @DefaultCheckInPrintLabelGuid = 'e81af83a-10f5-417f-ab76-220cebb927cc'
 DECLARE @RSCheckInPrintLabelGuid uniqueidentifier
 SET @RSCheckInPrintLabelGuid = '7C879FED-8B1B-4CE6-8EBD-8412331BEEC7'
 
+-- GUID for the Null Print Label provider
+DECLARE @NULLCheckInPrintLabelGuid uniqueidentifier
+SET @NULLCheckInPrintLabelGuid = '5240e0f9-265d-4c2c-bbff-8cc1c3d302a8'
+
 -- Security Code provider Lookup Type
 DECLARE @CheckInSecurityCodeSystemGuid uniqueidentifier
 SET @CheckInSecurityCodeSystemGuid = 'ea3f802d-29f0-4b7f-8dc3-b82c96007b8e'
@@ -273,6 +277,12 @@ IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @RSCheckInPrintLabelGuid )
 BEGIN
 INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
      VALUES (@RSCheckInPrintLabelGuid, @CheckInPrintLabelSystemLookupTypeID, 'Cccev RS Print Label Provider', '', 'Arena.Custom.Cccev.CheckIn', '', '', '', '', '', 'Arena.Custom.Cccev.CheckIn.Entity.RSPrintLabel', 1, 1, 0, NULL)
+END
+
+IF NOT EXISTS (SELECT * FROM core_lookup WHERE guid = @NULLCheckInPrintLabelGuid )
+BEGIN
+INSERT INTO core_lookup ([guid],[lookup_type_id],[lookup_value],[lookup_qualifier],[lookup_qualifier2],[lookup_qualifier3],[lookup_qualifier4],[lookup_qualifier5],[lookup_qualifier6],[lookup_qualifier7],[lookup_qualifier8],[lookup_order],[active],[system_flag],[foreign_key])
+     VALUES (@NULLCheckInPrintLabelGuid, @CheckInPrintLabelSystemLookupTypeID, 'Cccev Null Print Label Provider', '', 'Arena.Custom.Cccev.CheckIn', '', '', '', '', '', 'Arena.Custom.Cccev.CheckIn.Entity.NullPrintLabel', 1, 1, 0, NULL)
 END
 
 --------------------------------------------------------------------------
