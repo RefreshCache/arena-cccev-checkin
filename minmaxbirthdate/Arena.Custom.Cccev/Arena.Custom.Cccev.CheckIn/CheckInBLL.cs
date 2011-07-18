@@ -575,9 +575,10 @@ namespace Arena.Custom.Cccev.CheckIn
 
                 // Now check existing Arena criteria
                 if (RequiredAgeAndGrade(person, occurrence.OccurrenceType) &&
-                    RequiredGender(person, occurrence.OccurrenceType))
+                    RequiredGender(person, occurrence.OccurrenceType) &&
+                    RequiredBirthDate(person, occurrence.OccurrenceType))
                 {
-                    log.Append(" - Matched Age, Grade, Gender");
+                    log.Append(" - Matched Age, Grade, Gender, BirthDate");
 
                     // If there is no OccurrenceTypeAttribute skip these checks.
                     if (occurrenceTypeAttribute != null && occurrenceTypeAttribute.OccurrenceTypeAttributeId != Constants.NULL_INT)
@@ -1018,6 +1019,22 @@ namespace Arena.Custom.Cccev.CheckIn
             }
 
             return text;
+        }
+
+        /// <summary>
+        /// Determines whether or not the checkin has a birthdate.
+        /// </summary>
+        /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to test against</param>
+        /// <param name="type"><see cref="Arena.Core.OccurrenceType">OccurrenceType</see> that determines test criteria</param>
+        /// <returns>bool based on whether the person falls within the birthdate</returns>
+        private static bool RequiredBirthDate(Person person, OccurrenceType type)
+        {
+            if (type.MinBirthDate != Constants.NULL_DATE || type.MaxBirthDate != Constants.NULL_DATE)
+            {
+                return (person.BirthDate >= type.MinBirthDate && person.BirthDate <= type.MaxBirthDate);
+            }
+
+            return true;
         }
 
         /// <summary>
