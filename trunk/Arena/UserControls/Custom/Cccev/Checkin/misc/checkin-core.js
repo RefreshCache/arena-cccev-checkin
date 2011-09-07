@@ -1,17 +1,26 @@
 ﻿$(function () {
-    initPage();
+	// trick to preload image (before the network is gone)
+	$("#divPanicButton").addClass("networkWarning");
+	initPage();
+	// trick to preload image (before the network is gone)
+	$("#divPanicButton").removeClass("networkWarning");
 });
 
 Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function (sender, args) {
-    if (args.get_error() != null) {
-        if (args.get_response().get_statusCode() == '500') {
-            args.set_errorHandled(true);
-            alert($("input[id$='ihTimeoutError']").val());
-            $("input[id$='btnRedirect']").click();
-        }
-    }
 
-    initPage();
+	if (args.get_error() != null) {
+		var code = args.get_response().get_statusCode();
+		if (code == '500') {
+			args.set_errorHandled(true);
+			alert($("input[id$='ihTimeoutError']").val());
+			$("input[id$='btnRedirect']").click();
+		}
+		else if (code == '12007' || code == '12029') {
+			$("#divPanicButton").addClass("networkWarning");
+		}
+	}
+
+	initPage();
 });
 
 function initPage() {
@@ -89,7 +98,8 @@ function getState() {
         var timerLabel = $("span[id$='lblTimeRemaining']");
 
         if (timerLabel.length > 0) {
-            shouldRefresh = false;
+        	setupViewInfo("init", longInterval, false);
+            shouldRefresh = true;
         }
         else {
             setupViewInfo("init", shortInterval, false);
@@ -451,13 +461,17 @@ function Ticker(secs, pageID) {
         }
 
         timeString += seconds;
-        document.getElementById('CountDown').innerHTML = timeString;
+        var countdownSpan = $("#CountDown");
+        if (countdownSpan.length > 0) {
+        	countdownSpan.html(timeString);
+        }
         setTimeout("Ticker(" + (secs - 1) + ", " + pageID + ")", 990);
     }
 }
 
 function StartTimer(pageID) {
-    if (!(typeof (StartTime) == "undefined" && typeof (NowTime) == "undefined")) {
+	if (!(typeof (StartTime) == "undefined" && typeof (NowTime) == "undefined")) {
+		CountDownStarted = true;
         var startTime = new Date(StartTime);
         var rightNow = new Date(NowTime);
         ddiff = new Date(startTime - rightNow);
