@@ -4,10 +4,17 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInWizard.ascx.cs $
-* $Revision: 68 $ 
-* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   68   2010-11-17 14:17:00-07:00   JasonO $
+* $Revision: 70 $ 
+* $Header: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs   70   2011-08-08 14:22:15-07:00   nicka $
 * 
 * $Log: /trunk/Arena/UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx.cs $
+*  
+*  Revision: 70   Date: 2011-08-08 21:22:15Z   User: nicka 
+*  Change check-in to work for Attendance Type that don't specify age or grade 
+*  criteria. 
+*  
+*  Revision: 69   Date: 2011-06-01 18:22:39Z   User: JasonO 
+*  Updating from SVN 
 *  
 *  Revision: 68   Date: 2010-11-17 21:17:00Z   User: JasonO 
 *  
@@ -408,9 +415,10 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
 				
                 if (computer != null)
                 {
-					Session[CheckInConstants.SESS_KIOSK] = computer;
+                    Session[CheckInConstants.SESS_KIOSK] = computer;
                     occurrences = CheckInController.GetOccurrences(lookAhead, DateTime.Now, computer);
                     Session[CheckInConstants.SESS_LIST_OCCURRENCES_CHECKIN] = occurrences;
+                    Session[CheckInConstants.SESS_LIST_OCCURRENCETYPES_CHECKIN] = CheckInController.GetOccurrenceTypes( occurrences );
                 }
                 else
                 {
@@ -749,9 +757,13 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
                 try
                 {
                     // Filter out any relatives who are too young (#344) or too old or by grade
-                    List<FamilyMember> pplToCheckIn = (from FamilyMember fm in familyMembers
-                                       where CheckInController.CanCheckIn(fm, int.Parse(MinimumAgeSetting), int.Parse(MaximumAgeSetting), int.Parse(MinimumGradeSetting), int.Parse(MaximumGradeSetting) )
-                                       select fm).ToList();
+                    // Filter out any relatives who are too young (#344) or too old or by grade
+                    //List<FamilyMember> pplToCheckIn = (from FamilyMember fm in familyMembers
+                    //                   where CheckInController.CanCheckIn(fm, int.Parse(MinimumAgeSetting), int.Parse(MaximumAgeSetting), int.Parse(MinimumGradeSetting), int.Parse(MaximumGradeSetting) )
+                    //                   select fm).ToList();
+
+					// Only list people who are eligible to check-in at this point in time (issue http://redmine.refreshcache.com/issues/353)
+                    List<FamilyMember> pplToCheckIn = CheckInController.EligibleForCheckIn( familyMembers, (List<OccurrenceType>)Session[CheckInConstants.SESS_LIST_OCCURRENCETYPES_CHECKIN] );
 
                     if (pplToCheckIn.Count > 0)
                     {
