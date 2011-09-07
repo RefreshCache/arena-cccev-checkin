@@ -58,6 +58,13 @@ td
         width: 100px;
         z-index: 3;
     }
+    
+    .networkWarning
+    {
+    	background-color: #EEEE00;
+    	left: 10px;
+		background: url(../images/network_warning.png) no-repeat;
+    }
 
 div.heading
 {
