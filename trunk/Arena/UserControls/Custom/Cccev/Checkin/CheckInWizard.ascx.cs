@@ -121,6 +121,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Web.UI;
@@ -188,18 +189,22 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
         [NumericSetting("Maximum Phone Number Length", "Maximum length for phone number searches (defaults to 10).", false)]
         public string PhoneLengthMaxSetting { get { return Setting("PhoneLengthMax", "10", false); } }
 
+		// #344
+		[BooleanSetting( "Enable Additional Restrictions", "Controls whether or not to use additional, module-setting-based age and grade restrictions; otherwise the 'active' Attendance Types determine who is allowed to try to check-in.  Defaults to true.", false, true ), Category( "Restrictions" )]
+		public bool EnableRestrictionsSetting { get { return bool.Parse( Setting( "EnableRestrictions", "true", false )); } }
+
         // #344
-        [NumericSetting( "Minimum Age", "Minimum age of child who can check in. Note: Grade check supersedes the age check.  Leave blank for none.", false )]
+		[NumericSetting( "Minimum Age", "Minimum age of child who can check in. Note: Grade check supersedes the age check.  Leave blank for none.", false ), Category( "Restrictions" )]
         public string MinimumAgeSetting { get { return Setting( "MinimumAge", "-1", false ); } }
 
-        [NumericSetting( "Maximum Age", "Maximum age of child who can check in.  Note: Grade check supersedes the age check.  Leave blank for none.", false )]
+		[NumericSetting( "Maximum Age", "Maximum age of child who can check in.  Note: Grade check supersedes the age check.  Leave blank for none.", false ), Category( "Restrictions" )]
         public string MaximumAgeSetting { get { return Setting("MaximumAge", "-1", false); } }
 
         // #344
-        [NumericSetting( "Minimum Grade", "Minimum grade of child who can check in. Leave blank for none.", false )]
+		[NumericSetting( "Minimum Grade", "Minimum grade of child who can check in. Leave blank for none.", false ), Category( "Restrictions" )]
         public string MinimumGradeSetting { get { return Setting( "MinimumGrade", "-1", false ); } }
 
-        [NumericSetting("Maximum Grade", "Maximum grade of child who can check in. Default is 6.", false)]
+		[NumericSetting( "Maximum Grade", "Maximum grade of child who can check in. Default is 6.", false ), Category( "Restrictions" )]
         public string MaximumGradeSetting { get { return Setting("MaximumGrade", "6", false); } }
 
         [BooleanSetting("Require Attendee Abilities", "Determines whether or not to show view to set ability person attribute.", true, true)]
@@ -756,14 +761,19 @@ namespace ArenaWeb.UserControls.Custom.Cccev.Checkin
             {
                 try
                 {
-                    // Filter out any relatives who are too young (#344) or too old or by grade
-                    // Filter out any relatives who are too young (#344) or too old or by grade
-                    //List<FamilyMember> pplToCheckIn = (from FamilyMember fm in familyMembers
-                    //                   where CheckInController.CanCheckIn(fm, int.Parse(MinimumAgeSetting), int.Parse(MaximumAgeSetting), int.Parse(MinimumGradeSetting), int.Parse(MaximumGradeSetting) )
-                    //                   select fm).ToList();
-
-					// Only list people who are eligible to check-in at this point in time (issue http://redmine.refreshcache.com/issues/353)
-                    List<FamilyMember> pplToCheckIn = CheckInController.EligibleForCheckIn( familyMembers, (List<OccurrenceType>)Session[CheckInConstants.SESS_LIST_OCCURRENCETYPES_CHECKIN] );
+					List<FamilyMember> pplToCheckIn;
+					if ( EnableRestrictionsSetting )
+					{
+						// Filter out any relatives who are too young (#344) or too old or by grade
+						pplToCheckIn = (from FamilyMember fm in familyMembers
+						                   where CheckInController.CanCheckIn(fm, int.Parse(MinimumAgeSetting), int.Parse(MaximumAgeSetting), int.Parse(MinimumGradeSetting), int.Parse(MaximumGradeSetting) )
+						                   select fm).ToList();
+					}
+					else
+					{
+						// Only list people who are eligible to check-in at this point in time (issue http://redmine.refreshcache.com/issues/353)
+						pplToCheckIn = CheckInController.EligibleForCheckIn( familyMembers, (List<OccurrenceType>)Session[CheckInConstants.SESS_LIST_OCCURRENCETYPES_CHECKIN] );
+					}
 
                     if (pplToCheckIn.Count > 0)
                     {
