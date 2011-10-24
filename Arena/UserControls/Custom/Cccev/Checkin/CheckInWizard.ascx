@@ -21,7 +21,7 @@
 
     var StartTime;
     var NowTime;
-	var CountDownStarted = false;
+    var CountDownStarted = false;
     var txtPhone;
     var searchButton;
     var messageLabel;
