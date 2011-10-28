@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D6489B29-0180-4C62-B70A-1275126E5975}</ProjectGuid>
+    <ProjectGuid>{1F6141CA-775C-4F13-9FDC-E02ABEA3AD98}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Arena.Custom.Cccev.CheckIn</RootNamespace>
@@ -56,10 +56,14 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Arena.Framework, Version=2009.1.100.34401, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Arena\bin\Arena.Framework.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Arena.Custom.Cccev.DataUtils">
+      <HintPath>..\..\..\CheckIn\DLLs\Arena.Custom.Cccev.DataUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="Arena.Custom.Cccev.FrameworkUtils">
+      <HintPath>..\..\..\CheckIn\DLLs\Arena.Custom.Cccev.FrameworkUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="Arena.Framework">
+      <HintPath>..\..\..\..\Arena-SDK-2009.2\Arena.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ReportViewer.WebForms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -103,16 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Arena.Custom.Cccev.DataUtils\Arena.Custom.Cccev.DataUtils.csproj">
-      <Project>{652A7969-41E7-440A-9AA1-9A61D59C1973}</Project>
-      <Name>Arena.Custom.Cccev.DataUtils</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Arena.Custom.Cccev.FrameworkUtils\Arena.Custom.Cccev.FrameworkUtils.csproj">
-      <Project>{5E4542EB-C79E-4F07-B3F6-8200B234FDC8}</Project>
-      <Name>Arena.Custom.Cccev.FrameworkUtils</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

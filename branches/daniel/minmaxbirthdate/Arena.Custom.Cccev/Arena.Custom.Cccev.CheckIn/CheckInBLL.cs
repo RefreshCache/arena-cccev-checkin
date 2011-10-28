@@ -4,10 +4,30 @@
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
-* $Revision: 68 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   68   2010-11-30 11:05:56-07:00   JasonO $
+* $Revision: 74 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   74   2011-09-07 10:32:39-07:00   nicka $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
+*  
+*  Revision: 74   Date: 2011-09-07 17:32:39Z   User: nicka 
+*  Extra white-space before period. 
+*  
+*  Revision: 73   Date: 2011-08-21 16:57:07Z   User: nicka 
+*  Remove checking for Min/Max Grade == 0 because that is the Kindergarten 
+*  grade level. :( 
+*  
+*  Revision: 72   Date: 2011-08-16 22:34:34Z   User: nicka 
+*  Fixed bug (unset attendance types MinAge and MaxAge are now 0). 
+*  
+*  Revision: 71   Date: 2011-08-08 22:32:57Z   User: JasonO 
+*  Pre-Merge 
+*  
+*  Revision: 70   Date: 2011-08-08 21:54:36Z   User: nicka 
+*  refactor to slog less data around 
+*  
+*  Revision: 69   Date: 2011-08-08 21:22:10Z   User: nicka 
+*  Change check-in to work for Attendance Type that don't specify age or grade 
+*  criteria. 
 *  
 *  Revision: 68   Date: 2010-11-30 18:05:56Z   User: JasonO 
 *  Implementing R# recommendations to RequiredSpecialNeeds. 
@@ -160,6 +180,7 @@ namespace Arena.Custom.Cccev.CheckIn
 		public const string SESS_KIOSK = "cccev_ckin_kiosk";
 		public const string SESS_LIST_CHECKIN_FAMILYMEMBERS = "cccev_checkinFamilyMemberList";
 		public const string SESS_LIST_OCCURRENCES_CHECKIN = "cccev_checkinOccurrences";
+		public const string SESS_LIST_OCCURRENCETYPES_CHECKIN = "cccev_checkinOccurrenceTypes";
 		public const string SESS_RESULTS = "checkinResults";
 		public const string SESS_SERVICE_TIMES = "serviceTimes";
 		public const string SESS_STATE = "CCCEV_CHECKIN_STATE";
@@ -202,8 +223,6 @@ namespace Arena.Custom.Cccev.CheckIn
 
     public class CheckInController
     {
-
-		
         /// <summary>
         /// Determines whether or not a family member is allowed to check in based on age and grade passed in.
 		/// The grade check takes precedence over age check. 
@@ -212,6 +231,7 @@ namespace Arena.Custom.Cccev.CheckIn
         /// <param name="maxAge">Maximum age</param>
         /// <param name="maxGrade">Maximum grade level</param>
         /// <returns>bool indicating whether or not Family Member can check in to Occurrence Attendance</returns>
+		[Obsolete( "This method signature is deprecated and has been replaced by the EligibleForCheckIn() method." )]
         public static bool CanCheckIn(FamilyMember fm, int maxAge, int maxGrade)
 		{
 			return CanCheckIn( fm, Constants.NULL_INT, maxAge, Constants.NULL_INT, maxGrade );
@@ -227,6 +247,7 @@ namespace Arena.Custom.Cccev.CheckIn
 		/// <param name="minGrade">Minmum grade level</param>
 		/// <param name="maxGrade">Maximum grade level</param>
         /// <returns>bool indicating whether or not Family Member can check in to Occurrence Attendance</returns>
+		[Obsolete( "This method signature is deprecated and has been replaced by the EligibleForCheckIn() method." )]
         public static bool CanCheckIn(FamilyMember fm, int minAge, int maxAge, int minGrade, int maxGrade)
         {
             int gradeLevel = Person.CalculateGradeLevel(fm.GraduationDate, ArenaContext.Current.Organization.GradePromotionDate);
@@ -249,6 +270,66 @@ namespace Arena.Custom.Cccev.CheckIn
 			// No grade, no age, no checkin.
             return false;
         }
+
+		/// <summary>
+		/// Determines whether or each person in the given collection is allowed
+		/// to check in based on their age/grade and the given collection of
+		/// Attendance Types (aka OccurrenceType).  Normally people will only be
+		/// allowed to check-in if they match against at least one of the
+		/// Attendance Types, however in the event that one of the Attendance
+		/// Types does not specify any age or grade criteria, then even people 
+		/// whose age and/or grade is unknown will be allowed for possible checkin.
+		/// 
+		///	   Person's Age  Has Min      Has Max      CanCheckIn
+		///    Known         Age Setting  Age Setting  Result
+		///    ------------  -----------  -----------  ----------
+		/// 1. 0             0            0            1 (everyone passes)
+		/// 2. 0             0            1            0 (NO, cannot checkin w/o age)
+		/// 3. 0             1            0            0 (NO, cannot checkin w/o age)
+		/// 4. 0             1            1            0 (NO, cannot checkin w/o age)
+		/// 5. 1             0            0            1 (everyone passes)
+		/// 6. 1             0            1            1 (only if match criteria)
+		/// 7. 1             1            0            1 (only if match criteria)
+		/// 8. 1             1            1            1 (only if match both criteria)
+		/// 
+		/// See http://redmine.refreshcache.com/issues/353 for further details.
+		/// </summary>
+		/// <param name="people">a collection of <see cref="Arena.Core.FamilyMember">FamilyMember</see> for possible check in.</param>
+		/// <param name="occurrenceTypes">a list of <see cref="Arena.Core.OccurrenceType">OccurrenceType</see> to validate.</param>
+		/// <returns>a list of FamilyMembers who could possibly be checked in.</returns>
+		public static List<FamilyMember> EligibleForCheckIn( FamilyMemberCollection people, List<OccurrenceType> occurrenceTypes )
+		{
+			List<FamilyMember> allowedPeople = new List<FamilyMember>();
+			foreach ( FamilyMember person in people )
+			{
+				int grade = Person.CalculateGradeLevel( person.GraduationDate, ArenaContext.Current.Organization.GradePromotionDate );
+
+				var hasMatches = occurrenceTypes.Any( 
+					type => 
+					// matches age 
+					( type.MinAge <= person.Age && person.Age <= type.MaxAge )
+					||
+					// matches grade
+					( !HasGraduated( person ) && type.MinGrade <=  grade && grade <= type.MaxGrade )
+					||
+					// #1
+					// Matches anyone if age AND grade criteria are not specified on the Attendance Type
+					// (Here we check for either 0 or NULL_DECIMAL/NULL_INT Age because Arena could change to either
+					// of these in the future, but for Grade we check for NULL_INT because grade "0" is Kindergarten)  
+					( ( type.MinAge == 0 || type.MinAge == Constants.NULL_DECIMAL )
+						&& ( type.MaxAge == 0 || type.MaxAge == Constants.NULL_DECIMAL )
+						&& ( type.MinGrade == Constants.NULL_INT )
+						&& ( type.MaxGrade == Constants.NULL_INT ) )
+				);
+
+				if ( hasMatches )
+				{
+					allowedPeople.Add( person );
+				}
+			}
+
+			return allowedPeople;
+		}
 
 		/// <summary>
 		/// Test to see if a person has hit their graduation date. 
@@ -323,8 +404,8 @@ namespace Arena.Custom.Cccev.CheckIn
                 foreach (FamilyMember fm in family.FamilyMembers)
                 {
                     if (RequiredRecordStatus(fm))
-                    {
-                        activeFamilies.Add(family);
+                {
+                    activeFamilies.Add(family);
                         break;
                     }
                 }
@@ -489,6 +570,24 @@ namespace Arena.Custom.Cccev.CheckIn
             return (from o in oc
                     select o).Distinct().ToList();
         }
+
+        /// <summary>
+		/// Loads (or pre-fetches) the OccurrenceTypes from the given collection of
+		/// occurrences.
+		/// 
+		/// Note: Performance implications - since the current implementation of
+		/// FilterOccurrences eventually causes each occurrence to lazy load its
+		/// OccurrenceType (only once), we're just going to cause that to happen
+		/// now, in this method, instead of later.  We'll reserve the right to
+		/// create a new extension method on OccurrenceTypeCollection to do
+		/// this more efficiently if performance sucks.
+		/// </summary>
+		/// <param name="occurrences">A list of occurrences.</param>
+		/// <returns>A list of <see cref="Arena.Core.OccurrenceType">OccurrenceType</see></returns>
+		public static List<OccurrenceType> GetOccurrenceTypes( List<Occurrence> occurrences )
+		{
+			return ( from o in occurrences select o.OccurrenceType ).Distinct().ToList();
+		}
 
         /// <summary>
         /// Loads an OccurrenceAttendance based on Person ID and Occurrence Start Time.  Calls new extension method
@@ -1051,8 +1150,8 @@ namespace Arena.Custom.Cccev.CheckIn
                 return (gradeLevel >= type.MinGrade && gradeLevel <= type.MaxGrade);
             }
             
-            if ((type.MinAge != 0 || type.MaxAge != 0) &&
-                (type.MinAge != Constants.NULL_INT || type.MaxAge != Constants.NULL_INT))
+			// Check criteria if either  max or min age is set on the type.
+            if ( type.MinAge > 0 || type.MaxAge > 0 )
             {
                 decimal fractionalAge = DateUtils.GetFractionalAge(person.BirthDate);
                 return (fractionalAge >= type.MinAge && fractionalAge <= type.MaxAge);

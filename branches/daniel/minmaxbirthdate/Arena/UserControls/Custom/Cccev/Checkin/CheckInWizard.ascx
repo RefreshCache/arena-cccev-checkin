@@ -21,7 +21,7 @@
 
     var StartTime;
     var NowTime;
-
+    var CountDownStarted = false;
     var txtPhone;
     var searchButton;
     var messageLabel;
@@ -34,8 +34,9 @@
             StartTime = $get('<%= ihStartTime.ClientID %>').value;
             NowTime = $get('<%= ihNowTime.ClientID %>').value;
 
-            if ($get('CountDown').innerHTML == '') {
-                StartTimer('<%= CurrentPortalPage.PortalPageID %>');
+			// Don't start a countdown timer if one's aready going
+            if (! CountDownStarted) {
+            	StartTimer('<%= CurrentPortalPage.PortalPageID %>');
             }
         }
     }
