@@ -673,11 +673,12 @@ namespace Arena.Custom.Cccev.CheckIn
                                  occurrence.OccurrenceTypeID, occurrence.OccurrenceType.TypeName);
 
                 // Now check existing Arena criteria
-                if (RequiredAgeAndGrade(person, occurrence.OccurrenceType) &&
-                    RequiredGender(person, occurrence.OccurrenceType) &&
-                    RequiredBirthDate(person, occurrence.OccurrenceType))
+				if ( RequiredGrade( person, occurrence.OccurrenceType ) &&
+                       RequiredGender( person, occurrence.OccurrenceType ) &&
+                       RequiredBirthDate( person, occurrence.OccurrenceType ) &&
+                       RequiredAge( person, occurrence.OccurrenceType ) )
                 {
-                    log.Append(" - Matched Age, Grade, Gender, BirthDate");
+                    log.Append(" - Matched Grade, Gender, BirthDate, Age");
 
                     // If there is no OccurrenceTypeAttribute skip these checks.
                     if (occurrenceTypeAttribute != null && occurrenceTypeAttribute.OccurrenceTypeAttributeId != Constants.NULL_INT)
@@ -1120,29 +1121,29 @@ namespace Arena.Custom.Cccev.CheckIn
             return text;
         }
 
-        /// <summary>
-        /// Determines whether or not the checkin has a birthdate.
-        /// </summary>
-        /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to test against</param>
-        /// <param name="type"><see cref="Arena.Core.OccurrenceType">OccurrenceType</see> that determines test criteria</param>
-        /// <returns>bool based on whether the person falls within the birthdate</returns>
+		/// <summary>
+		/// Determines whether or not a person matches the Attendance Type's min/max birthdate (if it's required).
+		/// </summary>
+		/// <param name="person"><see cref="Arena.Core.Person">Person</see> to test against</param>
+		/// <param name="type"><see cref="Arena.Core.OccurrenceType">OccurrenceType</see> that determines test criteria</param>
+		/// <returns>bool based on whether the person falls within the birthdate</returns>
         private static bool RequiredBirthDate(Person person, OccurrenceType type)
         {
             if (type.MinBirthDate != Constants.NULL_DATE || type.MaxBirthDate != Constants.NULL_DATE)
             {
                 return (person.BirthDate >= type.MinBirthDate && person.BirthDate <= type.MaxBirthDate);
             }
-
+            
             return true;
         }
 
         /// <summary>
-        /// Determines whether or not age or grade are required for checkin.
+		/// Determines whether or not a person matches the Attendance Type's min/max grade (if it's required).
         /// </summary>
-        /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to test against</param>
+        /// <param name="person"><see cref="Arena.Core.Person">Person</see> to test against</param>
         /// <param name="type"><see cref="Arena.Core.OccurrenceType">OccurrenceType</see> that determines test criteria</param>
-        /// <returns>bool based on whether the person's age or grade falls within the allowable ages or grades</returns>
-        private static bool RequiredAgeAndGrade(Person person, OccurrenceType type)
+        /// <returns>bool based on whether the person's grade falls within the allowable grades</returns>
+        private static bool RequiredGrade(Person person, OccurrenceType type)
         {
             if (type.MinGrade != Constants.NULL_INT || type.MaxGrade != Constants.NULL_INT)
             {
@@ -1150,20 +1151,30 @@ namespace Arena.Custom.Cccev.CheckIn
                 return (gradeLevel >= type.MinGrade && gradeLevel <= type.MaxGrade);
             }
             
-			// Check criteria if either  max or min age is set on the type.
-            if ( type.MinAge > 0 || type.MaxAge > 0 )
-            {
-                decimal fractionalAge = DateUtils.GetFractionalAge(person.BirthDate);
-                return (fractionalAge >= type.MinAge && fractionalAge <= type.MaxAge);
-            }
-            
             return true;
         }
+
+		/// <summary>
+		/// Determines whether or not a person matches the Attendance Type's min/max age (if it's required).
+		/// </summary>
+		/// <param name="person"><see cref="Arena.Core.Person">Person</see> to test against</param>
+		/// <param name="type"><see cref="Arena.Core.OccurrenceType">OccurrenceType</see> that determines test criteria</param>
+		/// <returns>bool based on whether the person's age falls within the allowable ages</returns>
+		private static bool RequiredAge(Person person, OccurrenceType type)
+		{
+			if (type.MinAge > 0 || type.MaxAge > 0)
+			{
+				decimal fractionalAge = DateUtils.GetFractionalAge(person.BirthDate);
+				return (fractionalAge >= type.MinAge && fractionalAge <= type.MaxAge);
+			}
+
+			return true;
+		}
 
         /// <summary>
         /// Determines if the person has the required record status for check-in.
         /// </summary>
-        /// <param name="person">The person to check the record status of.</param>
+		/// <param name="person">The <see cref="Arena.Core.Person">Person</see> to check the record status of.</param>
         /// <returns>true if the person can be checked-in or false if they cannot.</returns>
         private static bool RequiredRecordStatus(Person person)
         {
@@ -1198,11 +1209,11 @@ namespace Arena.Custom.Cccev.CheckIn
 
         /// <summary>
         /// Determines whether or not the special needs requirement of a person matches the
-        /// occurrence type. A person's special need flag must match the special need flag
-        /// associated with the occurrence type. If either flag is not set, the flag is
-        /// assumed to be "no".
+		/// occurrence type (if it's required). A person's special need flag must match the
+		/// special need flag associated with the occurrence type. If either flag is not set,
+		/// the flag is assumed to be "no".
         /// </summary>
-        /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to test against</param>
+		/// <param name="person"><see cref="Arena.Core.Person">Person</see> to test against</param>
         /// <param name="attribute"><see cref="Arena.Custom.Cccev.CheckIn.Entity.OccurrenceTypeAttribute">OccurrenceTypeAttribute</see> that determines test criteria</param>
         /// <param name="attributeID">ID representing a Special Needs PersonAttribute</param>
         /// <returns>bool based on whether the person attribute matches the OccurrenceTypeAttribute's requirement for special needs</returns>
@@ -1217,9 +1228,9 @@ namespace Arena.Custom.Cccev.CheckIn
         }
 
         /// <summary>
-        /// Determines whether or not certain ability levels are required for checkin.
+		/// Determines whether or not certain ability levels are required for checkin (if it's required).
         /// </summary>
-        /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to test against</param>
+		/// <param name="person"><see cref="Arena.Core.Person">Person</see> to test against</param>
         /// <param name="attribute"><see cref="Arena.Custom.Cccev.CheckIn.Entity.OccurrenceTypeAttribute">OccurrenceTypeAttribute</see> that determines test criteria</param>
         /// <param name="attributeID">ID representing an Ability Level PersonAttribute</param>
         /// <returns>bool based on whether the person attribute matches the OccurrenceTypeAttribute's requirement for ability level</returns>
@@ -1252,9 +1263,9 @@ namespace Arena.Custom.Cccev.CheckIn
         }
 
         /// <summary>
-        /// Determines whether or not gender is required for checkin.
+		/// Determines whether or not a person matches the Attendance Type's gender (if it's required).
         /// </summary>
-        /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to test against</param>
+		/// <param name="person"><see cref="Arena.Core.Person">Person</see> to test against</param>
         /// <param name="type"><see cref="Arena.Core.OccurrenceType">OccurrenceType</see> that determines test criteria</param>
         /// <returns>bool based on whether the person's gender matches the gender requirement of the occurrence type</returns>
         private static bool RequiredGender(Person person, OccurrenceType type)
@@ -1268,9 +1279,9 @@ namespace Arena.Custom.Cccev.CheckIn
         }
 
         /// <summary>
-        /// Determines whether or not last initial needs to fall within a given range for checkin.
+		/// Determines whether or not last initial needs to fall within a given range for checkin (if it's required).
         /// </summary>
-        /// <param name="person"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to test against</param>
+		/// <param name="person"><see cref="Arena.Core.Person">Person</see> to test against</param>
         /// <param name="attribute"><see cref="OccurrenceTypeAttribute">OccurrenceTypeAttribute</see> that determines test criteria</param>
         /// <returns>bool based on whether the person's last initial falls within the range required by the occurrence type attribute</returns>
         private static bool RequiredLastName(Person person, OccurrenceTypeAttribute attribute)
