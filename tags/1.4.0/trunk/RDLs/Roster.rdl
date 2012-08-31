@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition">
+  <DataSources>
+    <DataSource Name="ArenaDB">
+      <DataSourceReference>ArenaDB</DataSourceReference>
+      <rd:DataSourceID>6c8994e5-bc0e-4fc2-b3fd-eeb342b96c50</rd:DataSourceID>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="Query">
+      <Fields>
+        <Field Name="security_code">
+          <DataField>security_code</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="occurrence_attendance_id">
+          <DataField>occurrence_attendance_id</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="check_in_time">
+          <DataField>check_in_time</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="family_id">
+          <DataField>family_id</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="system_id">
+          <DataField>system_id</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="nick_name">
+          <DataField>nick_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="last_name">
+          <DataField>last_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="birth_date">
+          <DataField>birth_date</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="age">
+          <DataField>age</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gender">
+          <DataField>gender</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="graduation_date">
+          <DataField>graduation_date</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="grade">
+          <DataField>grade</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="occurrence_name">
+          <DataField>occurrence_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="occurrence_description">
+          <DataField>occurrence_description</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="parent_names">
+          <DataField>parent_names</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="occurrence_start_time">
+          <DataField>occurrence_start_time</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="occurrence_end_time">
+          <DataField>occurrence_end_time</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="check_in_start">
+          <DataField>check_in_start</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="check_in_end">
+          <DataField>check_in_end</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="system_name">
+          <DataField>system_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="building_name">
+          <DataField>building_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="location_name">
+          <DataField>location_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="occurrence_type_name">
+          <DataField>occurrence_type_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="age_range_text">
+          <DataField>age_range_text</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="custody">
+          <DataField>custody</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="allergies">
+          <DataField>allergies</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>ArenaDB</DataSourceName>
+        <CommandText>	SELECT [coa].occurrence_attendance_id
+		,[coa].security_code
+		,[coa].check_in_time
+		,[cs].family_id
+		,[cs].system_id
+		,[cp].nick_name
+		,[cp].last_name
+		,[cp].birth_date
+		,[dbo].[cust_hdc_funct_calc_age]([cp].birth_date, 2, 100) AS 'age'
+		,CASE [cp].gender WHEN 0 THEN 'Male' WHEN 1 THEN 'Female' ELSE 'Unknown' END AS 'gender'
+		,[cp].graduation_date
+		,[dbo].[core_funct_grade_name]([cp].graduation_date, GETDATE(), 1) AS 'grade'
+		,[dbo].[cust_hdc_funct_parent_names]((SELECT TOP 1 [cfm].person_id FROM core_family_member AS [cfm] WHERE [cfm].family_id = [cs].family_id)) AS 'parent_names'
+		,[co].occurrence_name
+		,[co].occurrence_description
+		,[co].occurrence_start_time
+		,[co].occurrence_end_time
+		,[co].check_in_start
+		,[co].check_in_end
+		,[comps].system_name
+		,[ol].building_name
+		,[ol].location_name
+		,[cot].[type_name] AS 'occurrence_type_name'
+		,[cot].age_range_text
+		,ISNULL([cpaCustody].varchar_value,'') AS 'custody'
+		,ISNULL([cpaAllergies].varchar_value,'') AS 'allergies'
+		FROM core_occurrence_attendance AS [coa]
+		LEFT OUTER JOIN chkn_session AS [cs] ON [cs].session_id = [coa].session_id
+		LEFT JOIN core_person AS [cp] ON [cp].person_id = [coa].person_id
+		LEFT JOIN core_occurrence AS [co] ON [co].occurrence_id = [coa].occurrence_id
+		LEFT JOIN comp_system AS [comps] ON [comps].system_id = [cs].system_id
+		LEFT JOIN orgn_location AS [ol] ON [ol].location_id = [co].location_id
+		LEFT JOIN core_occurrence_type AS [cot] ON [cot].occurrence_type_id = [co].occurrence_type
+		LEFT OUTER JOIN core_person_attribute AS [cpaCustody] ON [cpaCustody].person_id = [coa].person_id AND [cpaCustody].attribute_id = 79
+		LEFT OUTER JOIN core_person_attribute AS [cpaAllergies] ON [cpaAllergies].person_id = [coa].person_id AND [cpaAllergies].attribute_id = 80
+		WHERE [coa].occurrence_attendance_id = @OccurrenceAttendanceID</CommandText>
+        <QueryParameters>
+          <QueryParameter Name="@OccurrenceAttendanceID">
+            <Value>=Parameters!OccurrenceAttendanceID.Value</Value>
+          </QueryParameter>
+        </QueryParameters>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+    </DataSet>
+  </DataSets>
+  <Body>
+    <ReportItems>
+      <Textbox Name="tbName">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!nick_name.Value</Value>
+                <Style>
+                  <FontSize>12pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value xml:space="preserve"> </Value>
+                <Style>
+                  <FontSize>12pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+              <TextRun>
+                <Value>=Fields!last_name.Value</Value>
+                <Style>
+                  <FontSize>12pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.7in</Top>
+        <Height>0.23in</Height>
+        <Width>2.25in</Width>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+      <Textbox Name="tbCheckInTime">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Format(Fields!check_in_time.Value, "M/dd/yyyy h:mm t\M") + Chr(10) + Chr(13) + "Service: " + Format(Fields!occurrence_start_time.Value, "h:mm t\M")</Value>
+                <Style>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Normal</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.43in</Top>
+        <Left>0.26in</Left>
+        <Height>0.27in</Height>
+        <Width>1.75in</Width>
+        <ZIndex>1</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <BackgroundColor>White</BackgroundColor>
+          <VerticalAlign>Middle</VerticalAlign>
+        </Style>
+      </Textbox>
+      <Textbox Name="tbFamilyNumber">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Right(Fields!security_code.Value, Len(Fields!security_code.Value) - 2)</Value>
+                <Style>
+                  <FontFamily>Arial Black</FontFamily>
+                  <FontSize>18pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                  <Color>White</Color>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.93in</Top>
+        <Left>0.61in</Left>
+        <Height>0.32in</Height>
+        <Width>1.05in</Width>
+        <ZIndex>2</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <BackgroundColor>Black</BackgroundColor>
+        </Style>
+      </Textbox>
+      <Textbox Name="tbTicketInfo">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Parent's Signature</Value>
+                <Style>
+                  <FontSize>7pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Left</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>1.76in</Top>
+        <Left>0.13in</Left>
+        <Height>0.12in</Height>
+        <Width>2.005in</Width>
+        <ZIndex>3</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Textbox>
+      <Textbox Name="tbCode">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Left(Fields!security_code.Value, 2)</Value>
+                <Style>
+                  <FontSize>12pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.93in</Top>
+        <Left>0.38167in</Left>
+        <Height>0.32in</Height>
+        <Width>0.20056in</Width>
+        <ZIndex>4</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <WritingMode>Vertical</WritingMode>
+        </Style>
+      </Textbox>
+      <Line Name="Line1">
+        <Top>0.425in</Top>
+        <Height>0in</Height>
+        <Width>2.25in</Width>
+        <ZIndex>5</ZIndex>
+        <Style>
+          <Border>
+            <Style>Solid</Style>
+          </Border>
+        </Style>
+      </Line>
+      <Textbox Name="tbTicketInfo2">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!parent_names.Value</Value>
+                <Style>
+                  <FontSize>8pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Left</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>1.85in</Top>
+        <Left>0.13in</Left>
+        <Height>0.15in</Height>
+        <Width>2.005in</Width>
+        <ZIndex>6</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <VerticalAlign>Top</VerticalAlign>
+        </Style>
+      </Textbox>
+      <Line Name="Line3">
+        <Top>1.76in</Top>
+        <Left>0.13in</Left>
+        <Height>0in</Height>
+        <Width>2.005in</Width>
+        <ZIndex>7</ZIndex>
+        <Style>
+          <Border>
+            <Style>Solid</Style>
+          </Border>
+        </Style>
+      </Line>
+      <Textbox Name="tbFamilyNumber2">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>="Allergies: " + Fields!allergies.Value</Value>
+                <Style>
+                  <FontSize>7pt</FontSize>
+                  <Color>White</Color>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Left</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>1.28in</Top>
+        <Left>0.13in</Left>
+        <Height>0.27in</Height>
+        <Width>2.005in</Width>
+        <ZIndex>8</ZIndex>
+        <Visibility>
+          <Hidden>=IIf(Fields!allergies.Value = "", True, False)</Hidden>
+        </Visibility>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <BackgroundColor>Black</BackgroundColor>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+        </Style>
+      </Textbox>
+      <Textbox Name="tbCustody">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>!</Value>
+                <Style>
+                  <FontSize>16pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.99681in</Top>
+        <Left>1.87458in</Left>
+        <Height>0.225in</Height>
+        <Width>0.13542in</Width>
+        <ZIndex>9</ZIndex>
+        <Visibility>
+          <Hidden>=Iif(Fields!custody.Value = "", True, False)</Hidden>
+        </Visibility>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Textbox>
+      <Textbox Name="Textbox3">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value />
+                <Style />
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>Textbox3</rd:DefaultName>
+        <Top>1.28in</Top>
+        <Left>0.0175in</Left>
+        <Height>0.27in</Height>
+        <Width>0.08472in</Width>
+        <ZIndex>10</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="tbRoom">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Fields!location_name.Value</Value>
+                <Style>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.22in</Top>
+        <Height>0.2in</Height>
+        <Width>1.25in</Width>
+        <ZIndex>11</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <VerticalAlign>Top</VerticalAlign>
+          <PaddingLeft>4pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="tbRoom2">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Roster</Value>
+                <Style>
+                  <FontSize>11pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                  <Color>White</Color>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Height>0.22in</Height>
+        <Width>2.25in</Width>
+        <ZIndex>12</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <BackgroundColor>Black</BackgroundColor>
+          <VerticalAlign>Top</VerticalAlign>
+          <PaddingTop>1pt</PaddingTop>
+        </Style>
+      </Textbox>
+      <Textbox Name="tbAge">
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=IIf(Fields!grade.Value = "", Fields!age.Value, IIf(Fields!grade.Value = "Kindergarten", "Kindergarten", Fields!grade.Value + " Grade"))</Value>
+                <Style>
+                  <FontSize>=IIf(Fields!grade.Value = "Kindergarten", "9pt", "10pt")</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.22in</Top>
+        <Left>1.25in</Left>
+        <Height>0.2in</Height>
+        <Width>1in</Width>
+        <ZIndex>13</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <VerticalAlign>Top</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>4pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+    </ReportItems>
+    <Height>2in</Height>
+    <Style />
+  </Body>
+  <ReportParameters>
+    <ReportParameter Name="OccurrenceAttendanceID">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>478296</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>OccurrenceAttendanceID</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Width>2.25in</Width>
+  <Page>
+    <PageHeight>2in</PageHeight>
+    <PageWidth>2.25in</PageWidth>
+    <InteractiveHeight>2in</InteractiveHeight>
+    <InteractiveWidth>2.25in</InteractiveWidth>
+    <Style />
+  </Page>
+  <rd:ReportID>e3e23733-65e0-4f92-8dea-6d44fcb4bdee</rd:ReportID>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+</Report>

@@ -1,0 +1,133 @@
+<ArenaPackage version="2009.2.100.1401">
+  <Readme>v1.3.1 - Works with Arena 2010.1 and 2010.2 (2011.x is officially untested, but reported to work)
+       - Updated the RS print provider to be more robust.
+       - Added Null Print Provider to allow check-in without printing.
+       - Fix packaging errors in the 1.3.0 release.
+
+v1.3.0 - Works with Arena 2010.1 and 2010.2
+       - Added a "maximum" phone length setting and changed behavior to only auto search if person enters max digits.
+       - Added a "minimum" age and grade module setting to filter family members.
+       - New scroll-bar mechanism which works great on various touch screens (iPad, etc.)
+       - Ctrl+Shift+M hot-key activates Kiosk Management page.
+       - Can now return back to another system (such as Family Registration) upon family check-in completion.
+       - Can use an Occurrence's "membership required" setting (if not set on the Attendance Type)
+         which works for either the related tag or related group.
+       - Clean up UI for cross browser consistency.
+       - Bug: fixed problem with kiosk throwing exception on first use
+
+v1.2.1 - Works with Arena 2009.2
+       - Added support for "At Kiosk" and "At Location" printing.
+       - Added support for print labels via Reporting Services.
+       - New Feature: Application Logging – Will log information for each 
+         attendee and detail which Occurrences the system attempts to match 
+         them to.
+       - New Feature: Room Balancing – New extended attribute to denote
+         whether or not an Attendance Type is “Room Balancing”. If an
+         Attendance Type is flagged for room balancing and has multiple
+         locations tied to it, the system will now check attendees into 
+         the room with the smallest head-count.
+       - Added support for Maximum People on Locations.
+       - Ctrl+Shift+R hot-key activates Family Registration page.
+       - Option to display room/location name on standard check-in label
+         nametag.
+
+v1.1.0 - Added support for Attendance Type "Membership Required for Check-In".
+         Attendance Types linked to Tags which have 'membership required' will now
+         only match if the person is a member of the tag.
+       - Bug fix for installations that do not have the GradePromotionDate org setting.</Readme>
+  <Modules>
+    <Module temp_module_id="-1" module_url="UserControls/Custom/Cccev/Checkin/AttendanceTypeListSummary.ascx" module_name="Attendance Type List Summary" module_desc="This module provides a summary view of Attendance Types and associated Extended Attributes." allows_child_modules="0" image_path="" _source="Arena\UserControls\Custom\Cccev\Checkin\AttendanceTypeListSummary.ascx" _source_image="" _system="0" />
+    <Module temp_module_id="-2" module_url="UserControls/Custom/Cccev/Checkin/MoveAttendance.ascx" module_name="Move Attendance Records" module_desc="The move attendance module is nice to have if you have the need to move all the attendance records from one occurrence to another (when you want to delete the old attendance types/occurrences but don’t want to lose the attendance records tied to them)." allows_child_modules="0" image_path="" _source="Arena\UserControls\Custom\Cccev\Checkin\MoveAttendance.ascx" _source_image="" _system="0" />
+    <Module temp_module_id="-3" module_url="UserControls/Custom/Cccev/Checkin/OccurrenceTypeAttributeList.ascx" module_name="Occurrence Type Attribute List" module_desc="The Occurrence Type Attribute List shows an ordered list of all corresponding Extended Attributes for the ordered list of Attendance Types.  You’ll want to place this module at the bottom of your standard Attendance Types page (pageID 1432)." allows_child_modules="0" image_path="" _source="Arena\UserControls\Custom\Cccev\Checkin\OccurrenceTypeAttributeList.ascx" _source_image="" _system="0" />
+    <Module temp_module_id="-4" module_url="UserControls/Custom/Cccev/Checkin/TestLabel.ascx" module_name="Test Printer Label" module_desc="This utility module lets test label printing to one or more printers at the same time.  Once you’ve selected some printers, you can print a single “test” label, individual parts of the label set, or if you provide a personID you can print an actual label set using your configured IPrintLabel provider. " allows_child_modules="0" image_path="" _source="Arena\UserControls\Custom\Cccev\Checkin\TestLabel.ascx" _source_image="" _system="0" />
+    <Module temp_module_id="-5" module_url="UserControls/Custom/Cccev/Checkin/CheckInWizard.ascx" module_name="Checkin Wizard" module_desc="A custom, self-service, check-in system by Central Christian Church (CCCEV) and High Desert Church (HDC)." allows_child_modules="0" image_path="" _source="Arena\UserControls\Custom\Cccev\Checkin\CheckInWizard.ascx" _source_image="" _system="0" />
+    <Module temp_module_id="-6" module_url="UserControls/Custom/Cccev/Checkin/KioskAdmin.ascx" module_name="Kiosk Management" module_desc="A simple module to help quickly &quot;register&quot; a kiosk with the Arena Kiosk list." allows_child_modules="0" image_path="" _source="Arena\UserControls\Custom\Cccev\Checkin\KioskAdmin.ascx" _source_image="" _system="0" />
+  </Modules>
+  <Pages>
+    <Page temp_page_id="-1" page_order="2147483647" display_in_nav="1" page_name="Childrens Check-in" page_desc="The CheckInWizard - a web based check-in system by CCCEV and HDC." page_settings="NavBarIcon=user1_monitor.png;NavBarHoverIcon=user1_monitor.png" require_ssl="0" guid="4639AEA0-4386-4619-A248-59044FBA1B79" system_flag="0" friendly_url="" validate_request="1" temp_parent_page_id="0">
+      <ModuleInstance temp_module_instance_id="-1" module_title="Childrens CheckIn Wizard" show_title="0" template_frame_name="Main" template_frame_order="0" module_details="" system_flag="0" mandatory="0" movable="0" description="" image_path="" temp_module_id="-5" temp_page_id="-1" module_settings="AllowScanByPhone=true;AutoCancelConfirm=true;BackgroundImagePath=UserControls/Custom/Cccev/Checkin/images/background_new.jpg;BadKioskText=This kiosk has not been registered.;EventIsClosedMessage=This event has been closed.;GetAttendeeAbilities=true;IgnoreCheckInStart=true;LookAheadHours=2;LookAheadMinutes=15;MaximumAge=13;NoEligibleCheckInPeople=There are no young children associated with your key tag. Visit the Children's Headquarters.;NoOccurrenceMessage=No classes are available at this time.;PhoneLength=10;PrintProvider=9622;ScanNowMessage=Scan Card &amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^ -or-;SearchByPhoneMessage=Search By Phone" module_instance_guid="f7068637-42db-42e2-b66d-43e75439c137" temp_page_or_template_id="-1" page_instance="1">
+        <Setting name="AbilityLevelAttributeID" value="" type_id="17" />
+        <Setting name="AbilityLevelLookupTypeID" value="" type_id="17" />
+        <Setting name="AllowScanByPhone" value="true" type_id="4" />
+        <Setting name="AutoCancelConfirm" value="true" type_id="4" />
+        <Setting name="BackgroundImagePath" value="UserControls/Custom/Cccev/Checkin/images/background_new.jpg" type_id="1" />
+        <Setting name="BadKioskText" value="This kiosk has not been registered." type_id="1" />
+        <Setting name="EventIsClosedMessage" value="This event has been closed." type_id="1" />
+        <Setting name="GetAttendeeAbilities" value="true" type_id="4" />
+        <Setting name="IgnoreCheckInStart" value="true" type_id="4" />
+        <Setting name="LookAheadHours" value="2" type_id="2" />
+        <Setting name="LookAheadMinutes" value="15" type_id="2" />
+        <Setting name="MaximumAge" value="13" type_id="2" />
+        <Setting name="NoEligibleCheckInPeople" value="There are no young children associated with your key tag. Visit the Children's Headquarters." type_id="1" />
+        <Setting name="NoOccurrenceMessage" value="No classes are available at this time." type_id="1" />
+        <Setting name="PhoneLength" value="10" type_id="2" />
+        <Setting name="PrintProvider" value="9622" type_id="10" guid="e81af83a-10f5-417f-ab76-220cebb927cc" />
+        <Setting name="RelationshipTypeIDs" value="" type_id="17" />
+        <Setting name="ScanNowMessage" value="Scan Card &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; -or-" type_id="1" />
+        <Setting name="SearchByPhoneMessage" value="Search By Phone" type_id="1" />
+        <Setting name="SpecialNeedsAttributeID" value="" type_id="17" />
+      </ModuleInstance>
+      <Page temp_page_id="-2" page_order="2147483647" display_in_nav="0" page_name="Kiosk Admin" page_desc="Management page to help with the setup of new kiosks." page_settings="" require_ssl="0" guid="82549bb1-8218-4a31-8c77-230b6343a91a" system_flag="0" friendly_url="" validate_request="1" temp_parent_page_id="-1">
+        <ModuleInstance temp_module_instance_id="-2" module_title="Kiosk Management" show_title="0" template_frame_name="Main" template_frame_order="0" module_details="" system_flag="0" mandatory="0" movable="0" description="" image_path="" temp_module_id="-6" temp_page_id="-2" module_settings="" module_instance_guid="496d36a5-2d4d-4ab3-87cd-0c33e8ad413f" temp_page_or_template_id="-2" page_instance="1">
+          <Setting name="ReturnUrl" value="" type_id="1" />
+        </ModuleInstance>
+      </Page>
+    </Page>
+  </Pages>
+  <Files>
+    <File path="bin/Arena.Custom.Cccev.DataUtils.dll" _source="DLLs\Arena.Custom.Cccev.DataUtils.dll" />
+    <File path="bin/Arena.Custom.Cccev.FrameworkUtils.dll" _source="DLLs\Arena.Custom.Cccev.FrameworkUtils.dll" />
+    <File path="bin/Arena.Custom.Cccev.CheckIn.dll" _source="Arena.Custom.Cccev\Arena.Custom.Cccev.CheckIn\bin\Release\Arena.Custom.Cccev.CheckIn.dll" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/background_new.jpg" _source="Arena\UserControls\Custom\Cccev\Checkin\images\background_new.jpg" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/big_roller.gif" _source="Arena\UserControls\Custom\Cccev\Checkin\images\big_roller.gif" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/button_active.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\button_active.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/button_inactive.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\button_inactive.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/button_selected.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\button_selected.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/cancel_button.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\cancel_button.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/checkbox.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\checkbox.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/checkin_bg.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\checkin_bg.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/checkmark.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\checkmark.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/ClassLocationSummary.jpg" _source="Arena\UserControls\Custom\Cccev\Checkin\images\ClassLocationSummary.jpg" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/data_gear.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\data_gear.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/default_checkin_splash.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\default_checkin_splash.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/empty_checkbox.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\empty_checkbox.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/footer_bg.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\footer_bg.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/name_button.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\name_button.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/next_button4.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\next_button4.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/next_button5.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\next_button5.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/phone_button.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\phone_button.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/phone_search3.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\phone_search3.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/printer.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\printer.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/printer_preferences.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\printer_preferences.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/restart_inv.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\restart_inv.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/search_button.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\search_button.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/test_label_icon.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\test_label_icon.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/text_box.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\text_box.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/user1_monitor.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\user1_monitor.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/downarrow.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\downarrow.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/scrollarea.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\scrollarea.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/scrollbar.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\scrollbar.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/images/uparrow.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\uparrow.png" />
+    <File path="include/componentArt/Images/user1_monitor.png" _source="Arena\UserControls\Custom\Cccev\Checkin\images\user1_monitor.png" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/checkin.css" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\checkin.css" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/countdown.js" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\countdown.js" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/popup.js" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\popup.js" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/popup_general.css" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\popup_general.css" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/checkin-core.js" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\checkin-core.js" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/ios.css" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\ios.css" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/ios.js" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\ios.js" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/jquery.jscrollpane.css" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\jquery.jscrollpane.css" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/jquery.jscrollpane.js" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\jquery.jscrollpane.js" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/BlankTemplate.ascx" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\BlankTemplate.ascx" />
+    <File path="UserControls/Custom/Cccev/Checkin/misc/BlankTemplate.ascx.cs" _source="Arena\UserControls\Custom\Cccev\Checkin\misc\BlankTemplate.ascx.cs" />
+  </Files>
+  <Info>
+    <Distributor>RefreshCache</Distributor>
+    <PackageName>Checkin Wizard</PackageName>
+    <Version>1.0.0</Version>
+    <Synopsis>Super fast, web based, self-serve, custom check-in system</Synopsis>
+    <Description>The Check-in Wizard is a self-serve "childrens check-in" kiosk ArenaChMS module used to by parents to check-in their kids into Sunday school. This module uses the underlying Arena check-in framework (Attendance Types, Occurrences, etc.) and some custom code that provides extended attributes for Attendance Types. Note: This is the live, production Children's check-in system at Central Christian Church and High Desert Church.</Description>
+    <ArenaVersion MinVersion="2009.2.400" MaxVersion="0.0.0" Version="0.0.0" />
+  </Info>
+  <Migration _source="" />
+</ArenaPackage>
