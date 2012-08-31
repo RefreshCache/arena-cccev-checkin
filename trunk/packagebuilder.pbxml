@@ -1,5 +1,7 @@
 <ArenaPackage version="2009.2.100.1401">
-  <Readme>v1.4.0 (beta)
+  <Readme>v1.4.0
+       - This version is NOT supported with Arena 2011.2 and NOT compatible
+         with Arena 2012.1.
        - Added feature to enable/disable min/max age &amp; grade restrictions via
          module settings.  For backwards compatibility, this setting is enabled
          by default, but we recommend you change it to false to allow the
@@ -63,7 +65,7 @@ v1.1.0 - Added support for Attendance Type "Membership Required for Check-In".
   </Modules>
   <Pages>
     <Page temp_page_id="-1" page_order="2147483647" display_in_nav="1" page_name="Childrens Check-in" page_desc="The CheckInWizard - a web based check-in system by CCCEV and HDC." page_settings="NavBarIcon=user1_monitor.png;NavBarHoverIcon=user1_monitor.png" require_ssl="0" guid="4639AEA0-4386-4619-A248-59044FBA1B79" system_flag="0" friendly_url="" validate_request="1" temp_parent_page_id="0">
-      <ModuleInstance temp_module_instance_id="-1" module_title="Childrens CheckIn Wizard" show_title="0" template_frame_name="Main" template_frame_order="0" module_details="" system_flag="0" mandatory="0" movable="0" description="" image_path="" temp_module_id="-5" temp_page_id="-1" module_settings="AllowScanByPhone=true;AutoCancelConfirm=true;BackgroundImagePath=UserControls/Custom/Cccev/Checkin/images/background_new.jpg;BadKioskText=This kiosk has not been registered.;EventIsClosedMessage=This event has been closed.;GetAttendeeAbilities=true;IgnoreCheckInStart=true;LookAheadHours=2;LookAheadMinutes=15;MaximumAge=13;NoEligibleCheckInPeople=There are no young children associated with your key tag. Visit the Children's Headquarters.;NoOccurrenceMessage=No classes are available at this time.;PhoneLength=10;PrintProvider=9622;ScanNowMessage=Scan Card &amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^ -or-;SearchByPhoneMessage=Search By Phone" module_instance_guid="f7068637-42db-42e2-b66d-43e75439c137" temp_page_or_template_id="-1" page_instance="1">
+      <ModuleInstance temp_module_instance_id="-1" module_title="Childrens CheckIn Wizard" show_title="0" template_frame_name="Main" template_frame_order="0" module_details="" system_flag="0" mandatory="0" movable="0" description="" image_path="" temp_module_id="-5" temp_page_id="-1" module_settings="EnableRestrictions=false;AllowScanByPhone=true;AutoCancelConfirm=true;BackgroundImagePath=UserControls/Custom/Cccev/Checkin/images/background_new.jpg;BadKioskText=This kiosk has not been registered.;EventIsClosedMessage=This event has been closed.;GetAttendeeAbilities=true;IgnoreCheckInStart=true;LookAheadHours=2;LookAheadMinutes=15;MaximumAge=13;NoEligibleCheckInPeople=There are no young children associated with your key tag. Visit the Children's Headquarters.;NoOccurrenceMessage=No classes are available at this time.;PhoneLength=10;PrintProvider=9622;ScanNowMessage=Scan Card &amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^&amp;nbsp^^ -or-;SearchByPhoneMessage=Search By Phone" module_instance_guid="f7068637-42db-42e2-b66d-43e75439c137" temp_page_or_template_id="-1" page_instance="1">
         <Setting name="AbilityLevelAttributeID" value="" type_id="17" />
         <Setting name="AbilityLevelLookupTypeID" value="" type_id="17" />
         <Setting name="EnableRestrictions" value="false" type_id="4" />
@@ -147,7 +149,7 @@ v1.1.0 - Added support for Attendance Type "Membership Required for Check-In".
     <Version>1.0.0</Version>
     <Synopsis>Super fast, web based, self-serve, custom check-in system</Synopsis>
     <Description>The Check-in Wizard is a self-serve "childrens check-in" kiosk ArenaChMS module used to by parents to check-in their kids into Sunday school. This module uses the underlying Arena check-in framework (Attendance Types, Occurrences, etc.) and some custom code that provides extended attributes for Attendance Types. Note: This is the live, production Children's check-in system at Central Christian Church and High Desert Church.</Description>
-    <ArenaVersion MinVersion="2009.2.400" MaxVersion="0.0.0" Version="0.0.0" />
+    <ArenaVersion MinVersion="2009.2.400" MaxVersion="2011.1.100" Version="0.0.0" />
   </Info>
   <Migration _source="" />
 </ArenaPackage>
