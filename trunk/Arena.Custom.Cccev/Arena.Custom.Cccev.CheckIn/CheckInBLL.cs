@@ -1,13 +1,18 @@
-/**********************************************************************
+﻿/********************************************************************
 * Description:  Controls business logic for Cccev Checkin Wizard
 * Created By:	Nick Airdo, Jason Offutt
 * Date Created:	11/12/2008
 *
 * $Workfile: CheckInBLL.cs $
-* $Revision: 74 $ 
-* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   74   2011-09-07 10:32:39-07:00   nicka $
+* $Revision: 75 $ 
+* $Header: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs   75   2011-10-28 15:21:23-07:00   nicka $
 * 
 * $Log: /trunk/Arena.Custom.Cccev/Arena.Custom.Cccev.CheckIn/CheckInBLL.cs $
+*  
+*  Revision: 75   Date: 2011-10-28 22:21:23Z   User: nicka 
+*  Features for 1.4.0.  Added support for Arena's min/max BirthDate on 
+*  Attendance Types and fixed bug whereby label would not print if second 
+*  occurrence was a fail. 
 *  
 *  Revision: 74   Date: 2011-09-07 17:32:39Z   User: nicka 
 *  Extra white-space before period. 
@@ -927,7 +932,8 @@ namespace Arena.Custom.Cccev.CheckIn
         }
 
         /// <summary>
-        /// Checks in an individual attendee.
+        /// Checks in an individual attendee.  A label will be printed as long as the person is checked into
+		/// at least the first occurrence.
         /// </summary>
         /// <param name="printLabel"><see cref="Arena.Custom.Cccev.CheckIn">IPrintLabel</see> to handle printing</param>
         /// <param name="attendee"><see cref="Arena.Core.FamilyMember">FamilyMember</see> to check in</param>
@@ -939,6 +945,9 @@ namespace Arena.Custom.Cccev.CheckIn
             int sessionID, ComputerSystem kiosk)
         {
             bool wasCheckedInSuccessfullyToAllClasses = true;
+			bool wasCheckedInSuccessfullyToFirstClass = false;
+			List<Occurrence> successfullyCheckedInOccurrences = new List<Occurrence>();
+			
 			OccurrenceAttendance firstAttendance = null;
         	var result = new PersonCheckInResult
         	             	 {
@@ -948,6 +957,8 @@ namespace Arena.Custom.Cccev.CheckIn
         	             		 IsPrintSuccessful = false
         	             	 };
 
+			// Try to check the given FamilyMember into each occurrence, and as long as the first one
+			// was successful, we're ok to print the labels in the first classroom.
             foreach (Occurrence occurrence in occurrences)
             {
             	var checkInResult = new CheckInResult
@@ -964,6 +975,9 @@ namespace Arena.Custom.Cccev.CheckIn
                         occurrence.OccurrenceID == Constants.NULL_INT) &&
                         DateTime.Now > occurrence.CheckInEnd)
                     {
+						// Q: what should we do if a person is not able to check into all their classes?
+						// -- I know the returned "result" will tell the caller, but do we even care anymore
+						// here??
                         wasCheckedInSuccessfullyToAllClasses = false;
                     }
                     else
@@ -981,13 +995,14 @@ namespace Arena.Custom.Cccev.CheckIn
                         attendance.SessionID = sessionID;
                         // Passing string literal here to avoid complications outside of an asp.net environment
                         attendance.Save("Cccev.CheckIn");
-
+						successfullyCheckedInOccurrences.Add( occurrence );
                     	result.Attendance = attendance;
                     	checkInResult.IsCheckInSuccessful = true;
 
                         if (firstAttendance == null)
                         {
                             firstAttendance = attendance;
+							wasCheckedInSuccessfullyToFirstClass = true;
                         }
                     }
                 }
@@ -1006,9 +1021,9 @@ namespace Arena.Custom.Cccev.CheckIn
                 }
             }
 
-            if (wasCheckedInSuccessfullyToAllClasses)
+			if ( wasCheckedInSuccessfullyToFirstClass /* wasCheckedInSuccessfullyToAllClasses */ )
             {
-                result.IsPrintSuccessful = PrintLabel(printLabel, attendee, occurrences, firstAttendance, kiosk);
+				result.IsPrintSuccessful = PrintLabel( printLabel, attendee, successfullyCheckedInOccurrences, firstAttendance, kiosk );
             }
 
             return result;
@@ -1073,7 +1088,7 @@ namespace Arena.Custom.Cccev.CheckIn
         /// </summary>
         /// <param name="printLabel"><see cref="Arena.Custom.Cccev.CheckIn">IPrintLabel</see> to handle printing</param>
         /// <param name="attendee"><see cref="Arena.Core.FamilyMember">FamilyMember</see> attending occurrence</param>
-        /// <param name="occurrences"><see cref="Arena.Core.OccurrenceCollection">OccurrenceCollection</see> of Occurrences the attendee can check into</param>
+        /// <param name="occurrences"><see cref="Arena.Core.OccurrenceCollection">OccurrenceCollection</see> of Occurrences the attendee *was* checked into</param>
         /// <param name="attendance"><see cref="Arena.Core.OccurrenceAttendance">OccurrenceAttendance</see> to be updated with failure status if print job fails</param>
 		/// <param name="kiosk"><see cref="Arena.Computer.ComputerSystem">ComputerSystem</see> the family is standing at</param>
         /// <returns>true if print succeeded</returns>
